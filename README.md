@@ -13,7 +13,7 @@ Install [Custom News Feed](https://plugins.qgis.org/plugins) directly in QGIS by
 The Custom News Feed plugin is licensed under the [GPL-3.0 license](LICENSE).
 Copyright © 2022 [GeoWerkstatt GmbH](https://www.geowerkstatt.ch)
 
-## Konfiguration file
+## Configuration file
 The JSON-file used to display your custom news has the following properties.
 
 
