@@ -24,6 +24,7 @@
 import os.path
 import json
 import requests
+from .network import networkaccessmanager
 
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt, QTimer
 from qgis.PyQt.QtGui import QIcon, QPixmap, QImage
@@ -50,6 +51,7 @@ class CustomNewsFeed:
         # Save reference to the QGIS interface
         self.iface = iface
         self.settings = QgsSettings()
+        self.nam = networkaccessmanager.NetworkAccessManager()
 
         # Run plugin when project is opened or created
         self.iface.projectRead.connect(self.run)
@@ -368,36 +370,29 @@ class CustomNewsFeed:
         self.settings_dlg.config_json_path.setText(path)
 
 
-    def get_text_contents_from_path(self, path):
+    def get_text_content_from_path(self, path):
         """Gets the text content from a path. May be a local path, or an url"""
         txt = None
-        if path[0:4].lower() == 'http':
-            QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
-            try:
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        try:
+            if path[0:4].lower() == 'http':
                 (response, content) = self.nam.request(path)
                 txt = content.decode("utf-8")
-            except Exception as e:
-                self.iface.messageBar().pushMessage("Error",
-                    self.tr(u'Reading file ') + path +
-                    self.tr(u'failed. ') +
-                    self.tr(u'See message log for more info.'),
-                    level = Qgis.Critical)
-                QgsMessageLog.logMessage(u'Error reading file ' + str(e),
-                                         'Custom News')
-            finally:
-                QApplication.restoreOverrideCursor()
-        else:
-            if (not os.path.exists(path)) \
-            and os.path.exists(os.path.join(self.plugin_dir, path)):
-               path = os.path.join(self.plugin_dir, path)
-            try:
+            else:
+                if (not os.path.exists(path)) \
+                and os.path.exists(os.path.join(self.plugin_dir, path)):
+                    path = os.path.join(self.plugin_dir, path)
                 with open(path,'r',encoding='utf-8') as f:
                     txt = f.read()
-            except Exception as e:
-                self.iface.messageBar().pushMessage("Error",
-                    self.tr(u'Reading file ') + path +
-                    self.tr(u'failed. ') +
-                    self.tr(u'See message log for more info.'),
-                    level = Qgis.Critical)
-                QgsMessageLog.logMessage(u'Error reading file ' + str(e), 'Custom News')
+        except Exception as e:            
+            self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
+                self.tr(u'Die Datei ') + path +
+                self.tr(u' konnte nicht gelesen werden. ') +
+                self.tr(u'Mehr Informationen im QGis message log. Beispielhafe News werden angezeigt.'),
+                level = Qgis.Critical)
+            QgsMessageLog.logMessage(u'Error reading file ' + str(e),'Custom News Feed')
+            with open(os.path.join(self.plugin_dir, 'sample_news','sample_news.json'),'r', encoding='utf-8') as f:
+                txt = f.read()
+        finally:
+                QApplication.restoreOverrideCursor()
         return txt
