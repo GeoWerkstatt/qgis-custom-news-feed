@@ -8,7 +8,7 @@
                              -------------------
         begin                : 2022-04-26
         copyright            : (C) 2022 by GeoWerkstatt
-        email                : office@geowerkstatt.ch
+        email                : support@geowerkstatt.ch
         git sha              : $Format:%H$
  ***************************************************************************/
 

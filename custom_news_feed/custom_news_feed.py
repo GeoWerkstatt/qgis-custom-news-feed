@@ -9,7 +9,7 @@
         begin                : 2022-04-26
         git sha              : $Format:%H$
         copyright            : (C) 2022 by GeoWerkstatt
-        email                : office@geowerkstatt.ch
+        email                : support@geowerkstatt.ch
  ***************************************************************************/
 
 /***************************************************************************
