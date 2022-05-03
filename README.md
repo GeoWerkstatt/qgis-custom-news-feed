@@ -12,3 +12,43 @@ Install [Custom News Feed](https://plugins.qgis.org/plugins) directly in QGIS by
 ## License
 The Custom News Feed plugin is licensed under the [GPL-3.0 license](LICENSE).
 Copyright © 2022 [GeoWerkstatt GmbH](https://www.geowerkstatt.ch)
+
+## Configuration file
+The JSON-file used to display your custom news has the following properties.
+
+
+    "PanelTitle" : string (mandatory),
+
+#### Articles which will be displayed in the main section of the plugin window
+    "NewsArticles": array of objects [
+            {
+                "Title":string (mandatory),
+                "Date": string (mandatody),
+                "Text":string (mandatory),
+                "LinkUrl":string (optional),
+                "LinkTitle": string (optional),
+                "ImageUrl": url (optional),
+            },
+            {
+                ...
+            }
+        ],
+
+#### Links which will be displayed below the main section of the plugin window
+        "LinkSectionTitle" : string (mandatory),
+        "Links": [
+            {
+                "Url":url (optional)
+                "LinkTitle": string (optional)
+            },
+        ],
+
+#### Message which will be displayed at the top of the news articles in green (low importance), yellow (medium importance) or red (high importance)
+        "PinnedMessage": {
+            "Text": string (optional),
+            "Importance": 'high', 'medium' or 'low' (optional)
+        }
+
+        "PathToConfigurationFileLabel": string (optional)
+    }
+
