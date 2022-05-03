@@ -236,24 +236,28 @@ class CustomNewsFeed:
 
     def display_news_content(self, news_json_file_path):
         """Display content of JSON-file in plugin."""
+        json_tree = self.get_text_content_from_path(news_json_file_path)
         try:
-            json_tree = self.get_text_contents_from_path(news_json_file_path)
             news = json.loads(json_tree)
+        except Exception as e:
+            print(str(e))
+            self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
+                    self.tr(u'JSON-file konnte nicht geladen werden. ') +
+                    self.tr(u'Mehr Informationen im QGis message log.'),
+                    level = Qgis.Critical)
+            QgsMessageLog.logMessage(u'Error Initializing Config file ' + str(e),'Custom News Feed Plugin')
+        try:
             self.dockwidget.setWindowTitle(news['PanelTitle'])
             self.dockwidget.linkSectionLabel.setText(news['LinkSectionTitle'])
             self.settings_dlg.pathToConfigurationFileLabel.setText(news["PathToConfigurationFileLabel"])
             self.configure_pinned_message(news["PinnedMessage"])
             self.addNews(news["NewsArticles"])
             self.addLinks(news["Links"])
-
         except Exception as e:
-            print(str(e))
-            self.iface.messageBar().pushMessage("Error",
-                    self.tr(u'Json file konnte nicht geladen werden. ') +
-                    self.tr(u'Mehr Informationen im QGis message log.'),
+            self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
+                    self.tr(u'Das Feld ' + str(e) + ' ist im angegebenen JSON-file nicht vorhanden.'),
                     level = Qgis.Critical)
-            QgsMessageLog.logMessage(u'Error Initializing Config file ' + str(e),
-                                          'Custom News Plugin')
+            QgsMessageLog.logMessage(u'Error Reading Config file, missing field ' + str(e),'Custom News Feed Plugin')
 
 
     def configure_pinned_message(self, pinnedMessageJson):
