@@ -227,7 +227,7 @@ class CustomNewsFeed:
 
 
     def get_news(self):
-        """Get news content from json-file and display it."""
+        """Get news content from JSON-file and display it."""
         news_json_file_path = self.settings.value("CustomNewsFeed/json_file_path", None)
         if not news_json_file_path:
                 news_json_file_path = os.path.join(self.plugin_dir, 'sample_news','sample_news.json')
@@ -235,7 +235,7 @@ class CustomNewsFeed:
 
 
     def display_news_content(self, news_json_file_path):
-        """Display content of json-file in plugin."""
+        """Display content of JSON-file in plugin."""
         try:
             json_tree = self.get_text_contents_from_path(news_json_file_path)
             news = json.loads(json_tree)
