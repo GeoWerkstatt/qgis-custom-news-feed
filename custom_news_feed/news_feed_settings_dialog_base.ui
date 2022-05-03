@@ -26,7 +26,7 @@
      <item>
       <widget class="QLineEdit" name="config_json_path">
        <property name="statusTip">
-        <string>Type URL or the path to a local file</string>
+        <string>URL oder lokalen Dateipfad eintippen</string>
        </property>
        <property name="inputMask">
         <string/>
@@ -39,7 +39,7 @@
      <item>
       <widget class="QPushButton" name="browse_btn">
        <property name="toolTip">
-        <string>Browse local file</string>
+        <string>Lokale Datei auswählen</string>
        </property>
        <property name="text">
         <string>...</string>
