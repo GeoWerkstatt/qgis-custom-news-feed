@@ -89,7 +89,6 @@ class CustomNewsFeed:
         # Add update interval to update news once a day
         self.timer = QTimer()
         self.timer.timeout.connect(self.get_news)
-        self.timer.start(86400000)
 
 
     # noinspection PyMethodMayBeStatic
@@ -247,6 +246,7 @@ class CustomNewsFeed:
                     level = Qgis.Critical)
             QgsMessageLog.logMessage(u'Error Initializing Config file ' + str(e),'Custom News Feed Plugin')
         try:
+            self.timer.start(news['NewsRefreshInterval'] * 60000 ) # convert minutes in miliseconds
             self.dockwidget.setWindowTitle(news['PanelTitle'])
             self.dockwidget.linkSectionLabel.setText(news['LinkSectionTitle'])
             self.settings_dlg.pathToConfigurationFileLabel.setText(news["PathToConfigurationFileLabel"])

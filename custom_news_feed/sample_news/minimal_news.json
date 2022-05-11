@@ -28,5 +28,6 @@
         "Text":"",
         "Importance": ""
     },
-    "PathToConfigurationFileLabel": "Pfad zur Konfigurationsdatei"
+    "PathToConfigurationFileLabel": "Pfad zur Konfigurationsdatei",
+    "NewsRefreshInterval": 60
 }
