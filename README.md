@@ -49,6 +49,11 @@ The JSON-file used to display your custom news has the following properties.
             "Importance": 'high', 'medium' or 'low' (optional)
         }
 
-        "PathToConfigurationFileLabel": string (optional)
+#### Label for the input box to select configuration file
+
+        "PathToConfigurationFileLabel": string (optional),
+
+#### Time interval (in minutes) after which the plugin rereads the configuration file
+        "NewsRefreshInterval": 60
     }
 
