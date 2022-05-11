@@ -220,8 +220,9 @@ class CustomNewsFeed:
         self.dockwidget.closingPlugin.connect(self.onClosePlugin)
 
         # Show the dockwidget
-        self.iface.addTabifiedDockWidget(Qt.RightDockWidgetArea, self.dockwidget, raiseTab=True)
-        self.dockwidget.show()
+        if not self.dockwidget.isUserVisible():
+            self.iface.addTabifiedDockWidget(Qt.RightDockWidgetArea, self.dockwidget, raiseTab=True)
+            self.dockwidget.show()
         self.get_news()
 
 

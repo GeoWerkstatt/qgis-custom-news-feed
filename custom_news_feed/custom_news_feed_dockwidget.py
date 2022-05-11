@@ -26,12 +26,13 @@ import os
 
 from qgis.PyQt import QtGui, QtWidgets, uic
 from qgis.PyQt.QtCore import pyqtSignal
+from qgis.gui import QgsDockWidget
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'custom_news_feed_dockwidget_base.ui'))
 
 
-class CustomNewsFeedDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
+class CustomNewsFeedDockWidget(QgsDockWidget, FORM_CLASS):
 
     closingPlugin = pyqtSignal()
 
