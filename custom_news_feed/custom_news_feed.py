@@ -320,7 +320,20 @@ class CustomNewsFeed:
 
             if not newsArticle["ImageUrl"] == "":
                 image = QImage()
-                image.loadFromData(requests.get(newsArticle["ImageUrl"]).content)
+                imageUrl = newsArticle["ImageUrl"]
+                try:
+                    if imageUrl[0:4].lower() == 'http':
+                        image.loadFromData(requests.get(imageUrl).content)
+                    else :
+                        with open(imageUrl, 'rb') as file:
+                            image.loadFromData(file.read())
+                except Exception as e:                                    
+                    self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
+                        self.tr(u'Das Bild mit der Url ') + imageUrl +
+                        self.tr(u' konnte nicht geladen werden. '),
+                        level = Qgis.Critical)
+                    QgsMessageLog.logMessage(u'Error reading image ' + str(e),'Custom News Feed')
+
                 image_label = QLabel()
                 image_label.setFixedSize(150, 150)
                 image_label.setPixmap(QPixmap(image).scaled(150, 150, Qt.KeepAspectRatio, Qt.SmoothTransformation))
