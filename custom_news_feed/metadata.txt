@@ -15,4 +15,4 @@ homepage=https://github.com/GeoWerkstatt/qgis-custom-news-feed
 
 category=Plugins
 icon=icon.png
-experimental=False
+experimental=True
