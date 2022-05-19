@@ -356,8 +356,9 @@ class CustomNewsFeed:
             left_inner_vbox.addWidget(text)
             left_inner_vbox.addWidget(link)
             left_inner_vbox.setSpacing(2)
-            if index == (len(newsArticles)-1):
-                left_inner_vbox.addStretch(1)
+            left_inner_vbox.addStretch(1)
+
+        self.dockwidget.vbox.addStretch(1)
 
         self.dockwidget.widget.setLayout(self.dockwidget.vbox)
         self.dockwidget.newsScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
