@@ -28,6 +28,6 @@
         "Text":"",
         "Importance": ""
     },
-    "PathToConfigurationFileLabel": "Pfad zur Konfigurationsdatei",
+    "PathToConfigurationFileLabel": "Enter path or url for the JSON-configuration",
     "NewsRefreshInterval": 60
 }

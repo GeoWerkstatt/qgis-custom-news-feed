@@ -1,7 +1,7 @@
 # Custom News Feed
 
 ## What do I use Custom News Feed for?
-Custom News Feed is a [QGIS](https://www.qgis.org/en/site/) plugin that lets you display a feed of articles containing a title, date, text, image and link. The information to display is managed in a JSON-file.
+Custom News Feed is a [QGIS](https://www.qgis.org/en/site/) plugin that lets you display a feed of articles containing a title, date, text, image and link. The information to display is managed in a JSON-file, that can be provided locally or via url.
 Custom News Feed plugin is helpful if you want to distriubte news articles organisation-wide.
 
 ![](dockpane_preview.png)
@@ -49,7 +49,7 @@ The JSON-file used to display your custom news has the following properties.
             "Importance": 'high', 'medium' or 'low' (optional)
         }
 
-#### Label for the input box to select configuration file
+#### Label for the input box to select configuration file (locally or via url)
 
         "PathToConfigurationFileLabel": string (optional),
 
