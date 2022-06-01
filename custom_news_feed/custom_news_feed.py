@@ -23,13 +23,11 @@
 """
 import os.path
 import json
-import requests
-from .network import networkaccessmanager
 
-from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt, QTimer
+from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt, QTimer, QUrl
 from qgis.PyQt.QtGui import QIcon, QPixmap, QImage
-from qgis.PyQt.QtWidgets import QAction
-from qgis.core import Qgis, QgsMessageLog, QgsSettings
+from qgis.PyQt.QtNetwork import QNetworkReply, QNetworkRequest 
+from qgis.core import Qgis, QgsMessageLog, QgsBlockingNetworkRequest, QgsSettings
 from qgis.PyQt.QtWidgets import QAction, QApplication, QWidget, \
                             QVBoxLayout, QHBoxLayout,\
                             QLabel, QFileDialog
@@ -51,7 +49,6 @@ class CustomNewsFeed:
         # Save reference to the QGIS interface
         self.iface = iface
         self.settings = QgsSettings()
-        self.nam = networkaccessmanager.NetworkAccessManager()
 
         # Run plugin when project is opened or created
         self.iface.projectRead.connect(self.run)
@@ -245,7 +242,7 @@ class CustomNewsFeed:
                     self.tr(u'JSON-file konnte nicht geladen werden. ') +
                     self.tr(u'Mehr Informationen im QGis message log.'),
                     level = Qgis.Critical)
-            QgsMessageLog.logMessage(u'Error Initializing Config file ' + str(e),'Custom News Feed Plugin')
+            QgsMessageLog.logMessage(u'Error Initializing Config file ' + str(e),'Custom News Feed')
         try:
             self.timer.start(news['NewsRefreshInterval'] * 60000 ) # convert minutes in miliseconds
             self.dockwidget.setWindowTitle(news['PanelTitle'])
@@ -258,7 +255,7 @@ class CustomNewsFeed:
             self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
                     self.tr(u'Das Feld ' + str(e) + ' ist im angegebenen JSON-file nicht vorhanden.'),
                     level = Qgis.Critical)
-            QgsMessageLog.logMessage(u'Error Reading Config file, missing field ' + str(e),'Custom News Feed Plugin')
+            QgsMessageLog.logMessage(u'Error Reading Config file, missing field ' + str(e),'Custom News Feed')
 
 
     def configure_pinned_message(self, pinnedMessageJson):
@@ -323,7 +320,19 @@ class CustomNewsFeed:
                 imageUrl = newsArticle["ImageUrl"]
                 try:
                     if imageUrl[0:4].lower() == 'http':
-                        image.loadFromData(requests.get(imageUrl).content)
+                        request = QNetworkRequest(QUrl(imageUrl))
+                        blockingRequest = QgsBlockingNetworkRequest()
+                        result = blockingRequest.get(request)
+                        if result == QgsBlockingNetworkRequest.NoError:
+                            reply = blockingRequest.reply()
+                            if reply.error() == QNetworkReply.NoError:
+                                image.loadFromData(reply.content())
+                            else:
+                                image = None;
+                                QgsMessageLog.logMessage(u'Error reading image ' + reply.errorString(),'Custom News Feed')
+                        else:
+                            image = None;
+                            QgsMessageLog.logMessage(u'Error reading image ' + blockingRequest.errorMessage(),'Custom News Feed')
                     else :
                         with open(imageUrl, 'rb') as file:
                             image.loadFromData(file.read())
@@ -333,13 +342,13 @@ class CustomNewsFeed:
                         self.tr(u' konnte nicht geladen werden. '),
                         level = Qgis.Critical)
                     QgsMessageLog.logMessage(u'Error reading image ' + str(e),'Custom News Feed')
-
-                image_label = QLabel()
-                image_label.setFixedSize(150, 150)
-                image_label.setPixmap(QPixmap(image).scaled(150, 150, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-                right_inner_vbox.setContentsMargins(0,15,0,0)
-                right_inner_vbox.addWidget(image_label)
-                right_inner_vbox.addStretch(1)
+                if image is not None:
+                    image_label = QLabel()
+                    image_label.setFixedSize(150, 150)
+                    image_label.setPixmap(QPixmap(image).scaled(150, 150, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+                    right_inner_vbox.setContentsMargins(0,15,0,0)
+                    right_inner_vbox.addWidget(image_label)
+                    right_inner_vbox.addStretch(1)
 
             title = QLabel(newsArticle['Title'])
             title.setStyleSheet("font-weight: bold")
@@ -395,8 +404,17 @@ class CustomNewsFeed:
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
             if path[0:4].lower() == 'http':
-                (response, content) = self.nam.request(path)
-                txt = content.decode("utf-8")
+                request = QNetworkRequest(QUrl(path))
+                blockingRequest = QgsBlockingNetworkRequest()
+                result = blockingRequest.get(request)
+                if result == QgsBlockingNetworkRequest.NoError:
+                    reply = blockingRequest.reply()
+                    if reply.error() == QNetworkReply.NoError:
+                        txt = str(reply.content(), 'utf-8')
+                    else:
+                        QgsMessageLog.logMessage(u'Error reading file ' + reply.errorString(),'Custom News Feed')
+                else:
+                    QgsMessageLog.logMessage(u'Error reading file ' + blockingRequest.errorMessage(),'Custom News Feed')
             else:
                 if (not os.path.exists(path)) \
                 and os.path.exists(os.path.join(self.plugin_dir, path)):
