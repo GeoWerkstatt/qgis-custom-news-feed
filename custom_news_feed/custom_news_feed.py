@@ -344,9 +344,9 @@ class CustomNewsFeed:
                     QgsMessageLog.logMessage(u'Error reading image ' + str(e),'Custom News Feed')
                 if image is not None:
                     image_label = QLabel()
-                    image_label.setFixedSize(150, 150)
-                    image_label.setPixmap(QPixmap(image).scaled(150, 150, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-                    right_inner_vbox.setContentsMargins(0,15,0,0)
+                    image_label.setFixedWidth(150)
+                    image_label.setPixmap(QPixmap(image).scaledToWidth(150, Qt.SmoothTransformation))
+                    right_inner_vbox.setContentsMargins(0,40,0,0)
                     right_inner_vbox.addWidget(image_label)
                     right_inner_vbox.addStretch(1)
 
