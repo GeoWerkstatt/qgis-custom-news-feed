@@ -346,7 +346,7 @@ class CustomNewsFeed:
                     image_label = QLabel()
                     image_label.setFixedWidth(150)
                     image_label.setPixmap(QPixmap(image).scaledToWidth(150, Qt.SmoothTransformation))
-                    right_inner_vbox.setContentsMargins(0,40,0,0)
+                    right_inner_vbox.setContentsMargins(0,5,0,0)
                     right_inner_vbox.addWidget(image_label)
                     right_inner_vbox.addStretch(1)
 
