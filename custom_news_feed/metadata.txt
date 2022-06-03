@@ -3,7 +3,7 @@ name=Custom News Feed
 qgisMinimumVersion=3.0
 description=This plugin helps you display a newsfeed in QGIS.
 about=This QGIS plugin lets you display a feed of articles containing a title, date, text, image and link. The information to display is managed in a JSON-file, that can be provided locally or via url. Custom News Feed plugin is helpful if you want to distriubte news articles organisation-wide.
-version=0.1
+version=1.0.0
 author=GeoWerkstatt GmbH
 email=support@geowerkstatt.ch
 
@@ -15,4 +15,4 @@ homepage=https://github.com/GeoWerkstatt/qgis-custom-news-feed
 
 category=Plugins
 icon=icon.png
-experimental=True
+experimental=False
