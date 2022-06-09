@@ -24,7 +24,7 @@
 import os.path
 import json
 
-from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt, QTimer, QUrl
+from qgis.PyQt.QtCore import QLocale, QTranslator, QCoreApplication, Qt, QTimer, QUrl
 from qgis.PyQt.QtGui import QIcon, QPixmap, QImage
 from qgis.PyQt.QtNetwork import QNetworkReply, QNetworkRequest 
 from qgis.core import Qgis, QgsMessageLog, QgsBlockingNetworkRequest, QgsSettings
@@ -58,7 +58,7 @@ class CustomNewsFeed:
         self.plugin_dir = os.path.dirname(__file__)
 
         # Initialize locale
-        locale = QSettings().value('locale/userLocale')[0:2]
+        locale = self.settings.value('locale/userLocale', QLocale().name())[0:2]
         locale_path = os.path.join(
             self.plugin_dir,
             'i18n',
