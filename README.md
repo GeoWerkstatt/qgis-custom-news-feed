@@ -28,6 +28,8 @@ The JSON-file used to display your custom news has the following properties.
                 "LinkUrl":string (optional),
                 "LinkTitle": string (optional),
                 "ImageUrl": url (optional),
+                "StartPublishingDate": iso.datetime (like "2023-05-12T06:00:00.000Z", optional),
+                "EndPublishingDate": iso.datetime (like "2023-05-12T06:00:00.000Z", optional)
             },
             {
                 ...
@@ -46,7 +48,9 @@ The JSON-file used to display your custom news has the following properties.
 #### Message which will be displayed at the top of the news articles in green (low importance), yellow (medium importance) or red (high importance)
         "PinnedMessage": {
             "Text": string (optional),
-            "Importance": 'high', 'medium' or 'low' (optional)
+            "Importance": 'high', 'medium' or 'low' (optional),
+            "StartPublishingDate": iso.datetime (like "2023-05-12T06:00:00.000Z", optional),
+            "EndPublishingDate": iso.datetime (like "2023-05-12T06:00:00.000Z", optional)
         }
 
 #### Label for the input box to select configuration file (locally or via url)
@@ -55,5 +59,3 @@ The JSON-file used to display your custom news has the following properties.
 
 #### Time interval (in minutes) after which the plugin rereads the configuration file
         "NewsRefreshInterval": 60
-    }
-

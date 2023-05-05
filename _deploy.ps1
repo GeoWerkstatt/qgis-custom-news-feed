@@ -1,0 +1,1 @@
+Copy-Item -Path D:\_SOURCE\qgis-custom-news-feed\custom_news_feed\* -Force  -Destination C:\Users\ogrimm\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\custom_news_feed -Recurse

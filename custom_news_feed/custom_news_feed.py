@@ -34,6 +34,7 @@ from qgis.PyQt.QtWidgets import QAction, QApplication, QWidget, \
 
 from .custom_news_feed_dockwidget import CustomNewsFeedDockWidget
 from .news_feed_settings_dialog import NewsFeedSettingsDialog
+from datetime import datetime
 
 class CustomNewsFeed:
     """QGIS Plugin Implementation."""
@@ -248,7 +249,10 @@ class CustomNewsFeed:
             self.dockwidget.setWindowTitle(news['PanelTitle'])
             self.dockwidget.linkSectionLabel.setText(news['LinkSectionTitle'])
             self.settings_dlg.pathToConfigurationFileLabel.setText(news["PathToConfigurationFileLabel"])
-            self.configure_pinned_message(news["PinnedMessage"])
+            if self.checkPublishingDate(news["PinnedMessage"]['StartPublishingDate'],news["PinnedMessage"]['EndPublishingDate']) == True:
+                self.configure_pinned_message(news["PinnedMessage"])
+            else:
+                self.dockwidget.pinned_message.setVisible(False)
             self.addNews(news["NewsArticles"])
             self.addLinks(news["Links"])
         except Exception as e:
@@ -295,6 +299,20 @@ class CustomNewsFeed:
         self.dockwidget.linksScrollArea.setWidgetResizable(True)
         self.dockwidget.linksScrollArea.setWidget(self.dockwidget.widget)
 
+    def checkPublishingDate(self, startdate, enddate):
+
+        ret = True
+        now = datetime.now().isoformat()
+
+        if (startdate is not None) and (enddate is not None):
+            if startdate <= now and enddate >= now: ret = True
+            else: ret = False
+        if (startdate is not None) and (enddate is None):        
+            if startdate > now: ret = False
+        if (enddate is not None) and (startdate is None): 
+            if enddate < now: ret = False
+
+        return ret
 
     def addNews(self, newsArticles):
         """ Add new articles to the news section of the plugin."""
@@ -302,6 +320,13 @@ class CustomNewsFeed:
         self.dockwidget.vbox = QVBoxLayout()
 
         for index, newsArticle in enumerate(newsArticles):
+            
+            # check the existence of a publishing date range
+            startdate = enddate = None
+            if 'StartPublishingDate' in json.loads(json.dumps(newsArticle)): startdate = newsArticle['StartPublishingDate'] 
+            if 'EndPublishingDate' in json.loads(json.dumps(newsArticle)): enddate = newsArticle['EndPublishingDate'] 
+            if self.checkPublishingDate(startdate, enddate) == False: continue
+            
             hbox = QHBoxLayout()
             left_inner_vbox = QVBoxLayout()
             right_inner_vbox = QVBoxLayout()
