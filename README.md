@@ -16,8 +16,9 @@ Copyright © 2022 [GeoWerkstatt GmbH](https://www.geowerkstatt.ch)
 ## Configuration file
 The JSON-file used to display your custom news has the following properties.
 
-
     "PanelTitle" : string (mandatory),
+    "PanelTitleFeed" : string (mandatory),
+    "PanelTitleFeedRepository" : string (mandatory),
 
 #### Articles which will be displayed in the main section of the plugin window
     "NewsArticles": array of objects [
