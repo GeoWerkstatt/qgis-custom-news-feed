@@ -59,3 +59,13 @@ The JSON-file used to display your custom news has the following properties.
 
 #### Time interval (in minutes) after which the plugin rereads the configuration file
         "NewsRefreshInterval": 60
+    }
+
+#### Configure the path to the News Feed in qgis_global_settings.ini
+
+A valid entry in this file overwrites the configuration coming from the settings dialog: 
+```
+[pythonplugins]
+# # path to the news feed json-file. This setting wins - in the case it exists -  against the plugin setting.
+customnewsfeedpath=//share/folder/sample_news.json
+```

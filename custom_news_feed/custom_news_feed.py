@@ -226,10 +226,15 @@ class CustomNewsFeed:
 
     def get_news(self):
         """Get news content from JSON-file and display it."""
-        news_json_file_path = self.settings.value("CustomNewsFeed/json_file_path", None)
+        if self.settings.contains('/pythonplugins/customnewsfeedpath'):
+            news_json_file_path = self.settings.value('/pythonplugins/customnewsfeedpath')
+        else:
+            news_json_file_path = self.settings.value("CustomNewsFeed/json_file_path", None)
         if not news_json_file_path:
-                news_json_file_path = os.path.join(self.plugin_dir, 'sample_news','sample_news.json')
+            news_json_file_path = os.path.join(self.plugin_dir, 'sample_news','sample_news.json')
+        QgsMessageLog.logMessage(u'Reading feed from: ' + news_json_file_path,'Custom News Feed')
         self.display_news_content(news_json_file_path)
+        
 
 
     def display_news_content(self, news_json_file_path):
