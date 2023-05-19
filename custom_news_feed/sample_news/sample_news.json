@@ -1,6 +1,8 @@
 {
     "PanelTitle" : "Your custom bird news",
     "LinkSectionTitle" : "Important links",
+    "PanelTitleFeed" : "news feed",
+    "PanelTitleFeedRepository" : "news repository",
     "NewsArticles": [
         {
             "Title":"Birds are your friends",
