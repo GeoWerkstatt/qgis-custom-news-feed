@@ -252,6 +252,8 @@ class CustomNewsFeed:
         try:
             self.timer.start(news['NewsRefreshInterval'] * 60000 ) # convert minutes in miliseconds
             self.dockwidget.setWindowTitle(news['PanelTitle'])
+            self.dockwidget.tabWidget.setTabText(0, news['PanelTitleFeed'])
+            self.dockwidget.tabWidget.setTabText(1, news['PanelTitleFeedRepository'])
             self.dockwidget.linkSectionLabel.setText(news['LinkSectionTitle'])
             self.settings_dlg.pathToConfigurationFileLabel.setText(news["PathToConfigurationFileLabel"])
             if self.checkPublishingDate(news["PinnedMessage"]['StartPublishingDate'],news["PinnedMessage"]['EndPublishingDate']) == True:

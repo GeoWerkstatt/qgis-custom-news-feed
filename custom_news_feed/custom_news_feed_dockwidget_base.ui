@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>504</width>
-    <height>826</height>
+    <width>569</width>
+    <height>860</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -43,7 +43,7 @@
 padding-left:8px;</string>
          </property>
          <property name="text">
-          <string>TextLabel</string>
+          <string>TextLabel  ×→</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -51,26 +51,45 @@ padding-left:8px;</string>
         </widget>
        </item>
        <item>
-        <widget class="QScrollArea" name="newsScrollArea">
+        <widget class="QTabWidget" name="tabWidget">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="widgetResizable">
-          <bool>true</bool>
+         <property name="currentIndex">
+          <number>0</number>
          </property>
-         <widget class="QWidget" name="scrollAreaWidgetContents_2">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>476</width>
-            <height>666</height>
-           </rect>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_3"/>
+         <widget class="QWidget" name="tab">
+          <attribute name="title">
+           <string>News</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item>
+            <widget class="QScrollArea" name="newsScrollArea">
+             <property name="widgetResizable">
+              <bool>true</bool>
+             </property>
+             <widget class="QWidget" name="scrollAreaWidgetContents_2">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>505</width>
+                <height>612</height>
+               </rect>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_4"/>
+             </widget>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab_2">
+          <attribute name="title">
+           <string>Page</string>
+          </attribute>
          </widget>
         </widget>
        </item>
@@ -106,126 +125,8 @@ padding-left:8px;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>476</width>
-            <height>52</height>
-           </rect>
-          </property>
-         </widget>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-   </layout>
-  </widget>
- </widget>
- <widget class="QDockWidget" name="CustomNewsFeedDockWidgetBase">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>504</width>
-    <height>826</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Custom</string>
-  </property>
-  <widget class="QWidget" name="dockWidgetContents">
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="1">
-     <widget class="QFrame" name="frame">
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QLabel" name="pinned_message">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>40</height>
-          </size>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">background:rgb(255, 206, 58);
-padding-left:8px;</string>
-         </property>
-         <property name="text">
-          <string>TextLabel</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QScrollArea" name="newsScrollArea">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="widgetResizable">
-          <bool>true</bool>
-         </property>
-         <widget class="QWidget" name="scrollAreaWidgetContents_2">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>476</width>
-            <height>666</height>
-           </rect>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_3"/>
-         </widget>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="linkSectionLabel">
-         <property name="text">
-          <string>Wichtige Links</string>
-         </property>
-         <property name="openExternalLinks">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QScrollArea" name="linksScrollArea">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>90</height>
-          </size>
-         </property>
-         <property name="widgetResizable">
-          <bool>true</bool>
-         </property>
-         <widget class="QWidget" name="scrollAreaWidgetContents">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>476</width>
-            <height>52</height>
+            <width>529</width>
+            <height>69</height>
            </rect>
           </property>
          </widget>
