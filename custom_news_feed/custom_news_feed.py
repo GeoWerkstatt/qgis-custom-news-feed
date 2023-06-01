@@ -177,10 +177,6 @@ class CustomNewsFeed:
         if event.button() == Qt.LeftButton:
             self.clicked.emit()
 
-    def show_message_box():
-        QgsMessageLog.logMessage(u'DEBUG: click registred','Custom News Feed')
-
-
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
         self.run()
@@ -236,6 +232,7 @@ class CustomNewsFeed:
 
     def get_news(self):
         """Get news content from JSON-file and display it."""
+        QgsMessageLog.logMessage(u'DEBUG: getting news','Custom News Feed')
         if self.settings.contains('/pythonplugins/customnewsfeedpath'):
             news_json_file_path = self.settings.value('/pythonplugins/customnewsfeedpath')
         else:
@@ -244,7 +241,6 @@ class CustomNewsFeed:
             news_json_file_path = os.path.join(self.plugin_dir, 'sample_news','sample_news.json')
         QgsMessageLog.logMessage(u'Reading feed from: ' + news_json_file_path,'Custom News Feed')
         self.display_news_content(news_json_file_path)
-        
 
 
     def display_news_content(self, news_json_file_path):
@@ -267,8 +263,8 @@ class CustomNewsFeed:
             self.dockwidget.linkSectionLabel.setText(news['LinkSectionTitle'])
             self.settings_dlg.pathToConfigurationFileLabel.setText(news["PathToConfigurationFileLabel"])
             if self.checkPublishingDate(news["PinnedMessage"]['StartPublishingDate'],news["PinnedMessage"]['EndPublishingDate']) == True:
-                self.configure_pinned_message(news["PinnedMessage"])
                 self.current_pinned_message = news["PinnedMessage"]
+                self.configure_pinned_message(news["PinnedMessage"])
             else:
                 self.dockwidget.pinned_message.setVisible(False)
             self.addNews(news["NewsArticles"])
@@ -279,24 +275,29 @@ class CustomNewsFeed:
                     level = Qgis.Critical)
             QgsMessageLog.logMessage(u'Error Reading Config file, missing field ' + str(e),'Custom News Feed')
 
-    def resize_pinned_message(self, event):
-        if self.dockwidget.pinned_message.text()[-3:] == '...':
-            self.dockwidget.pinned_message.setText(str(self.current_pinned_message["Text"]))
-        else:
-            self.dockwidget.pinned_message.setText(self.dockwidget.pinned_message.text()[:60]+ '...')
-            self.create_hashfile(hashlib.md5(str(self.current_pinned_message["Text"]).encode('utf-8')).hexdigest())
+    def toggle_message_hashfile(self, event):
+        """Toggles pinned messages resized/full-sized state"""
+        hash = hashlib.md5(str(self.current_pinned_message["Text"]).encode('utf-8')).hexdigest()
+        QgsMessageLog.logMessage(u'DEBUG: hash=' + hash,'Custom News Feed')
+        if self.check_hashfile(hash) == True :
+            self.delete_hashfile(hash)
+        else:                      
+            self.create_hashfile(hash)
 
 
     def configure_pinned_message(self, pinnedMessageJson):
         """Adds pinned message to plugin in three possible styles."""
         self.dockwidget.pinned_message.setVisible(False)
-        #check if hashfile exists (which indicates that the article is marked as read)
-        if self.check_hashfile(hashlib.md5(str(pinnedMessageJson["Text"]).encode('utf-8')).hexdigest()) == False :
-            self.dockwidget.pinned_message.setText(pinnedMessageJson["Text"])
+        self.dockwidget.pinned_message.mousePressEvent = self.toggle_message_hashfile
+        self.dockwidget.pinned_message.setText(str(self.current_pinned_message["Text"]))
+        QgsMessageLog.logMessage(u'DEBUG: resizing message: ' + hashlib.md5(str(pinnedMessageJson["Text"]).encode('utf-8')).hexdigest(),'Custom News Feed')
+        if self.check_hashfile(hashlib.md5(str(pinnedMessageJson["Text"]).encode('utf-8')).hexdigest()) == True :
+            QgsMessageLog.logMessage(u'DEBUG: Hash file exists','Custom News Feed')
+            self.dockwidget.pinned_message.setText(self.dockwidget.pinned_message.text()[:60]+ '...')
         else:
-            self.resize_pinned_message
+            QgsMessageLog.logMessage(u'DEBUG: Hash file does not exists','Custom News Feed')
+            self.dockwidget.pinned_message.setText(str(self.current_pinned_message["Text"]))
 
-        self.dockwidget.pinned_message.mousePressEvent = self.resize_pinned_message
         if pinnedMessageJson["Text"] != "":
             self.dockwidget.pinned_message.setVisible(True)
         if pinnedMessageJson["Importance"]=="low" :
@@ -334,7 +335,7 @@ class CustomNewsFeed:
 
 
     def checkPublishingDate(self, startdate, enddate):
-
+        """ Checks the date relevance of a news entry by its date range """
         ret = True
         now = datetime.now().isoformat()
 
@@ -349,7 +350,7 @@ class CustomNewsFeed:
         return ret
 
     def check_hashfile(self, newsident) -> bool:
-
+        """ Checks the existence of a hash file related to the news entry """
         path = abspath(join(QgsApplication.qgisSettingsDirPath(), 'customnewsfeed'))
         filename = abspath(join(path, newsident))
                 
@@ -358,9 +359,15 @@ class CustomNewsFeed:
         else:
             return False
 
+    def delete_hashfile(self, newsident):
+        """ Deletes a hash file related to the news entry """
+        path = abspath(join(QgsApplication.qgisSettingsDirPath(), 'customnewsfeed'))
+        filename = abspath(join(path, newsident))
+        os.remove(filename)
+        self.get_news()
 
     def create_hashfile(self, newsident):
-
+        """ Creates a hash file related to the news entry """
         path = abspath(join(QgsApplication.qgisSettingsDirPath(), 'customnewsfeed'))
         filename = abspath(join(path, newsident))
 
@@ -368,7 +375,6 @@ class CustomNewsFeed:
         if not QDir(filename): 
             file = open(filename, 'w')
             file.close()
-        
         self.get_news()
 
     def addNews(self, newsArticles):
