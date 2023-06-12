@@ -10,7 +10,7 @@
             "LinkTitle": "More about nesting",
             "ImageUrl": "https://p0.pxfuel.com/preview/127/71/605/pygmy-bird-of-prey-bird-wild-animal.jpg",
             "StartPublishingDate": "2023-05-05T06:00:00.000Z",
-            "EndPublishingDate": "2023-05-30T23:59:59.000Z"
+            "EndPublishingDate": "2023-12-31T23:59:59.000Z"
         },
         {
             "Title":"The story about the chicken and the egg",
@@ -27,8 +27,7 @@
             "LinkUrl":"https://en.wikipedia.org/wiki/Beak",
             "LinkTitle": "Learn about beaks",
             "ImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQp7KWxTpMgRpXlvzCgM8Q4Jukt3oaZBNuPKA&usqp=CAU",
-            "StartPublishingDate": "2023-05-12T06:00:00.000Z",
-            "EndPublishingDate": "2023-12-31T23:59:59.000Z"
+            "StartPublishingDate": "2023-05-12T06:00:00.000Z"
         },
         {
             "Title":"The sparrow",
@@ -37,8 +36,7 @@
             "LinkUrl":"",
             "LinkTitle": "",
             "ImageUrl": "https://pixnio.com/free-images/2017/11/09/2017-11-09-19-25-59-550x367.jpg",
-            "StartPublishingDate": "2023-05-01T06:00:00.000Z",
-            "EndPublishingDate": "2023-05-03T23:59:59.000Z"
+            "EndPublishingDate": "2025-05-12T23:59:59.000Z"
         },
         {
             "Title":"Do birds of the feather really flock together?",
@@ -81,7 +79,7 @@
         "Text":"Message of medium importance: A small number of species, such as ducks and geese, lose all of their flight feathers at once, temporarily becoming flightless.",
         "Importance": "medium",
         "StartPublishingDate": "2023-05-05T06:00:00.000Z",
-        "EndPublishingDate": "2023-05-30T23:59:59.000Z"
+        "EndPublishingDate": "2026-05-30T23:59:59.000Z"
     },
     "PathToConfigurationFileLabel": "Enter path or url for the JSON-configuration",
     "NewsRefreshInterval": 60

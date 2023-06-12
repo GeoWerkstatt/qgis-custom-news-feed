@@ -304,17 +304,17 @@ class CustomNewsFeed:
         self.dockwidget.linksScrollArea.setWidgetResizable(True)
         self.dockwidget.linksScrollArea.setWidget(self.dockwidget.widget)
 
-   def checkPublishingDate(self, startdate, enddate):
-    now = datetime.now().isoformat()
+    def checkPublishingDate(self, startdate, enddate):
+        now = datetime.now().isoformat()
 
-    if startdate and enddate:
-        return startdate <= now <= enddate
-    elif startdate:
-        return startdate <= now
-    elif enddate:
-        return now <= enddate
+        if startdate and enddate:
+            return startdate <= now <= enddate
+        elif startdate:
+            return startdate <= now
+        elif enddate:
+            return now <= enddate
 
-    return True
+        return True
 
 
     def addNews(self, newsArticles):
