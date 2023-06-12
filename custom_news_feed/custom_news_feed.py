@@ -227,12 +227,12 @@ class CustomNewsFeed:
         if not self.dockwidget.isUserVisible():
             self.iface.addTabifiedDockWidget(Qt.RightDockWidgetArea, self.dockwidget, raiseTab=True)
             self.dockwidget.show()
+            #self.dockwidget.close()
         self.get_news()
 
 
     def get_news(self):
         """Get news content from JSON-file and display it."""
-        QgsMessageLog.logMessage(u'DEBUG: getting news','Custom News Feed')
         if self.settings.contains('/pythonplugins/customnewsfeedpath'):
             news_json_file_path = self.settings.value('/pythonplugins/customnewsfeedpath')
         else:
@@ -275,10 +275,10 @@ class CustomNewsFeed:
                     level = Qgis.Critical)
             QgsMessageLog.logMessage(u'Error Reading Config file, missing field ' + str(e),'Custom News Feed')
 
+
     def toggle_message_hashfile(self, event):
         """Toggles pinned messages resized/full-sized state"""
         hash = hashlib.md5(str(self.current_pinned_message["Text"]).encode('utf-8')).hexdigest()
-        QgsMessageLog.logMessage(u'DEBUG: hash=' + hash,'Custom News Feed')
         if self.check_hashfile(hash) == True :
             self.delete_hashfile(hash)
         else:                      
@@ -290,12 +290,9 @@ class CustomNewsFeed:
         self.dockwidget.pinned_message.setVisible(False)
         self.dockwidget.pinned_message.mousePressEvent = self.toggle_message_hashfile
         self.dockwidget.pinned_message.setText(str(self.current_pinned_message["Text"]))
-        QgsMessageLog.logMessage(u'DEBUG: resizing message: ' + hashlib.md5(str(pinnedMessageJson["Text"]).encode('utf-8')).hexdigest(),'Custom News Feed')
         if self.check_hashfile(hashlib.md5(str(pinnedMessageJson["Text"]).encode('utf-8')).hexdigest()) == True :
-            QgsMessageLog.logMessage(u'DEBUG: Hash file exists','Custom News Feed')
             self.dockwidget.pinned_message.setText(self.dockwidget.pinned_message.text()[:60]+ '...')
         else:
-            QgsMessageLog.logMessage(u'DEBUG: Hash file does not exists','Custom News Feed')
             self.dockwidget.pinned_message.setText(str(self.current_pinned_message["Text"]))
 
         if pinnedMessageJson["Text"] != "":
@@ -384,6 +381,8 @@ class CustomNewsFeed:
         self.dockwidget.vbox = QVBoxLayout()
         self.dockwidget.vbox2 = QVBoxLayout()
 
+        widgetcount=0
+
         for index, newsArticle in enumerate(newsArticles):
 
             # check the existence of a publishing date range
@@ -395,18 +394,18 @@ class CustomNewsFeed:
             # create hash as identifier
             newsArticle['Hash'] = hashlib.md5(str(newsArticle['Title']+newsArticle['Date']).encode('utf-8')).hexdigest()
 
+            hbox = QHBoxLayout()
+            left_inner_vbox = QVBoxLayout()
+            right_inner_vbox = QVBoxLayout()
+            hbox.addLayout(left_inner_vbox)
+            hbox.addLayout(right_inner_vbox)
+
+            self.dockwidget.vbox.addLayout(hbox)
+            self.dockwidget.vbox.setContentsMargins(15,15,15,15)
+            self.dockwidget.vbox.setSpacing(20)
+
             #check if hashfile exists (which indicates that the article is marked as read)
             if self.check_hashfile(newsArticle['Hash']) == False and self.checkPublishingDate(startdate, enddate) == True:
-
-                hbox = QHBoxLayout()
-                left_inner_vbox = QVBoxLayout()
-                right_inner_vbox = QVBoxLayout()
-                hbox.addLayout(left_inner_vbox)
-                hbox.addLayout(right_inner_vbox)
-
-                self.dockwidget.vbox.addLayout(hbox)
-                self.dockwidget.vbox.setContentsMargins(15,15,15,15)
-                self.dockwidget.vbox.setSpacing(20)
 
                 text= QLabel(newsArticle['Text'])
                 text.setWordWrap(True)
@@ -467,6 +466,7 @@ class CustomNewsFeed:
                 left_inner_vbox.addWidget(link)
                 left_inner_vbox.addWidget(readbutton)
                 left_inner_vbox.setSpacing(2)
+                widgetcount = widgetcount+1
                 #left_inner_vbox.addStretch(1)
 
                 self.dockwidget.vbox.addStretch(1)
@@ -558,6 +558,16 @@ class CustomNewsFeed:
                 self.dockwidget.newsScrollArea2.setWidget(self.dockwidget.widget2)    
           
             self.dockwidget.tabWidget.setCurrentIndex(0)
+
+        #if left_inner_vbox.count() == 0: 
+        if widgetcount == 0 and self.check_hashfile(hashlib.md5(str(self.current_pinned_message["Text"]).encode('utf-8')).hexdigest()) == True :
+            self.dockwidget.close()
+            self.iface.messageBar().pushMessage("Warning", "Aktuell existieren keine ungelesenen Nachrichten", level=Qgis.Warning)
+        else:
+            if self.dockwidget.isUserVisible():
+                self.dockwidget.show()
+            else:
+                self.iface.messageBar().pushMessage("Warning", "Es liegen neue Nachrichten vor!", level=Qgis.Warning)                
 
 
     def run_settings(self):
