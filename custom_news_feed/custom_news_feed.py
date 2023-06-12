@@ -304,20 +304,18 @@ class CustomNewsFeed:
         self.dockwidget.linksScrollArea.setWidgetResizable(True)
         self.dockwidget.linksScrollArea.setWidget(self.dockwidget.widget)
 
-    def checkPublishingDate(self, startdate, enddate):
+   def checkPublishingDate(self, startdate, enddate):
+    now = datetime.now().isoformat()
 
-        ret = True
-        now = datetime.now().isoformat()
+    if startdate and enddate:
+        return startdate <= now <= enddate
+    elif startdate:
+        return startdate <= now
+    elif enddate:
+        return now <= enddate
 
-        if (startdate is not None) and (enddate is not None):
-            if startdate <= now and enddate >= now: ret = True
-            else: ret = False
-        if (startdate is not None) and (enddate is None):        
-            if startdate > now: ret = False
-        if (enddate is not None) and (startdate is None): 
-            if enddate < now: ret = False
+    return True
 
-        return ret
 
     def addNews(self, newsArticles):
         """ Add new articles to the news section of the plugin."""
