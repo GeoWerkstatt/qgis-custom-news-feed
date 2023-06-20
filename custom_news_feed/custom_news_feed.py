@@ -34,6 +34,7 @@ from qgis.PyQt.QtWidgets import QAction, QApplication, QWidget, \
 
 from .custom_news_feed_dockwidget import CustomNewsFeedDockWidget
 from .news_feed_settings_dialog import NewsFeedSettingsDialog
+from datetime import datetime
 
 class CustomNewsFeed:
     """QGIS Plugin Implementation."""
@@ -225,10 +226,15 @@ class CustomNewsFeed:
 
     def get_news(self):
         """Get news content from JSON-file and display it."""
-        news_json_file_path = self.settings.value("CustomNewsFeed/json_file_path", None)
+        if self.settings.contains('/pythonplugins/customnewsfeedpath'):
+            news_json_file_path = self.settings.value('/pythonplugins/customnewsfeedpath')
+        else:
+            news_json_file_path = self.settings.value("CustomNewsFeed/json_file_path", None)
         if not news_json_file_path:
-                news_json_file_path = os.path.join(self.plugin_dir, 'sample_news','sample_news.json')
+            news_json_file_path = os.path.join(self.plugin_dir, 'sample_news','sample_news.json')
+        QgsMessageLog.logMessage(u'Reading feed from: ' + news_json_file_path,'Custom News Feed')
         self.display_news_content(news_json_file_path)
+        
 
 
     def display_news_content(self, news_json_file_path):
@@ -248,7 +254,10 @@ class CustomNewsFeed:
             self.dockwidget.setWindowTitle(news['PanelTitle'])
             self.dockwidget.linkSectionLabel.setText(news['LinkSectionTitle'])
             self.settings_dlg.pathToConfigurationFileLabel.setText(news["PathToConfigurationFileLabel"])
-            self.configure_pinned_message(news["PinnedMessage"])
+            if self.checkPublishingDate(news["PinnedMessage"]['StartPublishingDate'],news["PinnedMessage"]['EndPublishingDate']) == True:
+                self.configure_pinned_message(news["PinnedMessage"])
+            else:
+                self.dockwidget.pinned_message.setVisible(False)
             self.addNews(news["NewsArticles"])
             self.addLinks(news["Links"])
         except Exception as e:
@@ -295,6 +304,18 @@ class CustomNewsFeed:
         self.dockwidget.linksScrollArea.setWidgetResizable(True)
         self.dockwidget.linksScrollArea.setWidget(self.dockwidget.widget)
 
+    def checkPublishingDate(self, startdate, enddate):
+        now = datetime.now().isoformat()
+
+        if startdate and enddate:
+            return startdate <= now <= enddate
+        elif startdate:
+            return startdate <= now
+        elif enddate:
+            return now <= enddate
+
+        return True
+
 
     def addNews(self, newsArticles):
         """ Add new articles to the news section of the plugin."""
@@ -302,6 +323,13 @@ class CustomNewsFeed:
         self.dockwidget.vbox = QVBoxLayout()
 
         for index, newsArticle in enumerate(newsArticles):
+            
+            # check the existence of a publishing date range
+            startdate = enddate = None
+            if 'StartPublishingDate' in json.loads(json.dumps(newsArticle)): startdate = newsArticle['StartPublishingDate'] 
+            if 'EndPublishingDate' in json.loads(json.dumps(newsArticle)): enddate = newsArticle['EndPublishingDate'] 
+            if self.checkPublishingDate(startdate, enddate) == False: continue
+            
             hbox = QHBoxLayout()
             left_inner_vbox = QVBoxLayout()
             right_inner_vbox = QVBoxLayout()

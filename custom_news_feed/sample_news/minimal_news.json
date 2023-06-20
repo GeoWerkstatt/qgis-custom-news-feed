@@ -8,7 +8,9 @@
             "Text":"Based on fossil and biological evidence, most scientists accept that birds are a specialised subgroup of theropod dinosaurs and, more specifically, members of Maniraptora, a group of theropods which includes dromaeosaurids and oviraptorosaurs, among others. As scientists have discovered more theropods closely related to birds, the previously clear distinction between non-birds and birds has become blurred. Recent discoveries in the Liaoning Province of northeast China, which demonstrate many small theropod feathered dinosaurs, contribute to this ambiguity.",
             "LinkUrl":"",
             "LinkTitle": "",
-            "ImageUrl": ""
+            "ImageUrl": "",
+            "StartPublishingDate": "2023-05-05T06:00:00.000Z",
+            "EndPublishingDate": "2023-05-30T23:59:59.000Z"
         },
         {
             "Title":"Birds are no longer your friends",
@@ -16,7 +18,8 @@
             "Text":"Based on fossil and biological evidence, most scientists accept that birds are a specialised subgroup of theropod dinosaurs and, more specifically, members of Maniraptora, a group of theropods which includes dromaeosaurids and oviraptorosaurs, among others. As scientists have discovered more theropods closely related to birds, the previously clear distinction between non-birds and birds has become blurred. Recent discoveries in the Liaoning Province of northeast China, which demonstrate many small theropod feathered dinosaurs, contribute to this ambiguity.",
             "LinkUrl":"",
             "LinkTitle": "",
-            "ImageUrl": ""
+            "ImageUrl": "",
+            "StartPublishingDate": "2023-05-15T06:00:00.000Z"
         }
     ],
              
@@ -26,7 +29,9 @@
 
     "PinnedMessage": {
         "Text":"",
-        "Importance": ""
+        "Importance": "",
+        "StartPublishingDate": "2023-05-05T06:00:00.000Z",
+        "EndPublishingDate": "2023-05-30T23:59:59.000Z"
     },
     "PathToConfigurationFileLabel": "Enter path or url for the JSON-configuration",
     "NewsRefreshInterval": 60

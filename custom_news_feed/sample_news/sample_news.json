@@ -8,7 +8,9 @@
             "Text":"Based on fossil and biological evidence, most scientists accept that birds are a specialised subgroup of theropod dinosaurs and, more specifically, members of Maniraptora, a group of theropods which includes dromaeosaurids and oviraptorosaurs, among others. As scientists have discovered more theropods closely related to birds, the previously clear distinction between non-birds and birds has become blurred. Recent discoveries in the Liaoning Province of northeast China, which demonstrate many small theropod feathered dinosaurs, contribute to this ambiguity.",
             "LinkUrl":"https://en.wikipedia.org/wiki/Nesting_instinct",
             "LinkTitle": "More about nesting",
-            "ImageUrl": "https://p0.pxfuel.com/preview/127/71/605/pygmy-bird-of-prey-bird-wild-animal.jpg"
+            "ImageUrl": "https://p0.pxfuel.com/preview/127/71/605/pygmy-bird-of-prey-bird-wild-animal.jpg",
+            "StartPublishingDate": "2023-05-05T06:00:00.000Z",
+            "EndPublishingDate": "2023-12-31T23:59:59.000Z"
         },
         {
             "Title":"The story about the chicken and the egg",
@@ -24,7 +26,8 @@
             "Text":"Many species of birds are economically important as food for human consumption and raw material in manufacturing, with domesticated and undomesticated birds being important sources of eggs, meat, and feathers. Songbirds, parrots, and other species are popular as pets. Guano (bird excrement) is harvested for use as a fertiliser. Birds figure throughout human culture. About 120 to 130 species have become extinct due to human activity since the 17th century, and hundreds more before then. Human activity threatens about 1,200 bird species with extinction, though efforts are underway to protect them. Recreational birdwatching is an important part of the ecotourism industry.",
             "LinkUrl":"https://en.wikipedia.org/wiki/Beak",
             "LinkTitle": "Learn about beaks",
-            "ImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQp7KWxTpMgRpXlvzCgM8Q4Jukt3oaZBNuPKA&usqp=CAU"
+            "ImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQp7KWxTpMgRpXlvzCgM8Q4Jukt3oaZBNuPKA&usqp=CAU",
+            "StartPublishingDate": "2023-05-12T06:00:00.000Z"
         },
         {
             "Title":"The sparrow",
@@ -32,7 +35,8 @@
             "Text":"Based on fossil and biological evidence, most scientists accept that birds are a specialised subgroup of theropod dinosaurs and, more specifically, members of Maniraptora, a group of theropods which includes dromaeosaurids and oviraptorosaurs, among others. As scientists have discovered more theropods closely related to birds, the previously clear distinction between non-birds and birds has become blurred. Recent discoveries in the Liaoning Province of northeast China, which demonstrate many small theropod feathered dinosaurs, contribute to this ambiguity.",
             "LinkUrl":"",
             "LinkTitle": "",
-            "ImageUrl": "https://pixnio.com/free-images/2017/11/09/2017-11-09-19-25-59-550x367.jpg"
+            "ImageUrl": "https://pixnio.com/free-images/2017/11/09/2017-11-09-19-25-59-550x367.jpg",
+            "EndPublishingDate": "2025-05-12T23:59:59.000Z"
         },
         {
             "Title":"Do birds of the feather really flock together?",
@@ -73,7 +77,9 @@
 
     "PinnedMessage": {
         "Text":"Message of medium importance: A small number of species, such as ducks and geese, lose all of their flight feathers at once, temporarily becoming flightless.",
-        "Importance": "medium"
+        "Importance": "medium",
+        "StartPublishingDate": "2023-05-05T06:00:00.000Z",
+        "EndPublishingDate": "2026-05-30T23:59:59.000Z"
     },
     "PathToConfigurationFileLabel": "Enter path or url for the JSON-configuration",
     "NewsRefreshInterval": 60
