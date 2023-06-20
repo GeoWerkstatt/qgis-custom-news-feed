@@ -90,7 +90,7 @@ class CustomNewsFeed:
 
         # Add update interval to update news once a day
         self.timer = QTimer()
-        self.timer.timeout.connect(self.get_news)
+        self.timer.timeout.connect(self.reloadNews)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -227,6 +227,7 @@ class CustomNewsFeed:
         if not self.dockwidget.isUserVisible():
             self.iface.addTabifiedDockWidget(Qt.RightDockWidgetArea, self.dockwidget, raiseTab=True)
             self.dockwidget.show()
+            self.forceShowGui = True
             #self.dockwidget.close()
         self.get_news()
 
@@ -374,6 +375,10 @@ class CustomNewsFeed:
             file.close()
         self.get_news()
 
+    def reloadNews(self):
+        self.forceShowGui = False
+        self.get_news()
+
     def addNews(self, newsArticles):
         """ Add new articles to the news section of the plugin."""
         self.dockwidget.widget = QWidget()
@@ -405,7 +410,7 @@ class CustomNewsFeed:
             self.dockwidget.vbox.setSpacing(20)
 
             #check if hashfile exists (which indicates that the article is marked as read)
-            if self.check_hashfile(newsArticle['Hash']) == False and self.checkPublishingDate(startdate, enddate) == True:
+            if (self.check_hashfile(newsArticle['Hash']) == False and self.checkPublishingDate(startdate, enddate) == True):
 
                 text= QLabel(newsArticle['Text'])
                 text.setWordWrap(True)
@@ -560,14 +565,14 @@ class CustomNewsFeed:
             self.dockwidget.tabWidget.setCurrentIndex(0)
 
         #if left_inner_vbox.count() == 0: 
-        if widgetcount == 0 and self.check_hashfile(hashlib.md5(str(self.current_pinned_message["Text"]).encode('utf-8')).hexdigest()) == True :
+        if (widgetcount == 0 and self.check_hashfile(hashlib.md5(str(self.current_pinned_message["Text"]).encode('utf-8')).hexdigest()) == True) and not self.forceShowGui:
             self.dockwidget.close()
-            self.iface.messageBar().pushMessage("Warning", "Aktuell existieren keine ungelesenen Nachrichten", level=Qgis.Warning)
+            self.iface.messageBar().pushMessage("Warning", "Aktuell existieren keine ungelesenen Nachrichten", level=Qgis.Info)
         else:
-            if self.dockwidget.isUserVisible():
+            if self.dockwidget.isUserVisible() or self.forceShowGui:
                 self.dockwidget.show()
             else:
-                self.iface.messageBar().pushMessage("Warning", "Es liegen neue Nachrichten vor!", level=Qgis.Warning)                
+                self.iface.messageBar().pushMessage("Warning", "Es liegen neue Nachrichten vor!", level=Qgis.Info)                
 
 
     def run_settings(self):
