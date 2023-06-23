@@ -351,8 +351,7 @@ class CustomNewsFeed:
     def check_hashfile(self, newsident) -> bool:
         """ Checks the existence of a hash file related to the news entry """
         path = abspath(join(QgsApplication.qgisSettingsDirPath(), 'customnewsfeed'))
-        filename = abspath(join(path, newsident))
-                
+        filename = abspath(join(path, newsident))              
         if os.path.exists(filename):
             return True
         else:
@@ -397,9 +396,6 @@ class CustomNewsFeed:
             if 'EndPublishingDate' in json.loads(json.dumps(newsArticle)): enddate = newsArticle['EndPublishingDate'] 
             #if self.checkPublishingDate(startdate, enddate) == False: continue
 
-            # create hash as identifier
-            newsArticle['Hash'] = hashlib.md5(str(newsArticle['Title']+newsArticle['Date']).encode('utf-8')).hexdigest()
-
             hbox = QHBoxLayout()
             left_inner_vbox = QVBoxLayout()
             right_inner_vbox = QVBoxLayout()
@@ -409,6 +405,9 @@ class CustomNewsFeed:
             self.dockwidget.vbox.addLayout(hbox)
             self.dockwidget.vbox.setContentsMargins(15,15,15,15)
             self.dockwidget.vbox.setSpacing(20)
+
+            # create hash as identifier
+            newsArticle['Hash'] = hashlib.md5(str(newsArticle['Title']+newsArticle['Date']).encode('utf-8')).hexdigest()
 
             #check if hashfile exists (which indicates that the article is marked as read)
             if (self.check_hashfile(newsArticle['Hash']) == False and self.checkPublishingDate(startdate, enddate) == True):
@@ -482,6 +481,7 @@ class CustomNewsFeed:
                 self.dockwidget.newsScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
                 self.dockwidget.newsScrollArea.setWidgetResizable(True)
                 self.dockwidget.newsScrollArea.setWidget(self.dockwidget.widget)
+
 
             else:
 
@@ -559,22 +559,25 @@ class CustomNewsFeed:
                 self.dockwidget.widget2.setLayout(self.dockwidget.vbox2)
                 self.dockwidget.newsScrollArea2.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
                 self.dockwidget.newsScrollArea2.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-                self.dockwidget.newsScrollArea2.setWidgetResizable(True)
-                self.dockwidget.newsScrollArea2.setWidget(self.dockwidget.widget2)    
+                self.dockwidget.newsScrollArea2.setWidgetResizable(True) 
+                self.dockwidget.newsScrollArea2.setWidget(self.dockwidget.widget2)  
+
+                #dirty hack to refresh main tab in the case it is empty
+                self.dockwidget.newsScrollArea.setWidget(self.dockwidget.widget)    
           
             self.dockwidget.tabWidget.setCurrentIndex(0)
 
-
-        #if (widgetcount == 0 and self.check_hashfile(hashlib.md5(str(self.current_pinned_message["Text"]).encode('utf-8')).hexdigest()) == True) and not self.forceShowGui:
-        if (widgetcount == 0 and self.check_hashfile(hashlib.md5(str(self.current_pinned_message["Text"]).encode('utf-8')).hexdigest()) == True):
+        if (widgetcount == 0 and self.check_hashfile(hashlib.md5(str(self.current_pinned_message["Text"]).encode('utf-8')).hexdigest())):
             self.dockwidget.close()
             self.iface.messageBar().pushMessage("Warning", "Aktuell existieren keine ungelesenen Nachrichten", level=Qgis.Info)
+        elif (widgetcount == 0 and not self.check_hashfile(hashlib.md5(str(self.current_pinned_message["Text"]).encode('utf-8')).hexdigest())):
+            self.dockwidget.close()
         else:
-            if self.dockwidget.isUserVisible() or self.forceShowGui:
-                self.dockwidget.show()
-            else:
-                self.iface.messageBar().pushMessage("Warning", "Es liegen neue Nachrichten vor!", level=Qgis.Info)                
+            self.iface.messageBar().pushMessage("Info", "Es liegen neue Nachrichten vor!", level=Qgis.Info)                
 
+        if self.forceShowGui and not self.dockwidget.isUserVisible():
+            self.dockwidget.show()
+        self.forceShowGui = False
 
     def run_settings(self):
         """ Shows the settings dialog"""
@@ -587,7 +590,6 @@ class CustomNewsFeed:
             path = unicode(self.settings_dlg.config_json_path.text())
             self.settings.setValue("CustomNewsFeed/json_file_path", path)
             self.display_news_content(path)
-
 
     def choose_file(self):
         """Allows the user to choose a local path for the config file."""
