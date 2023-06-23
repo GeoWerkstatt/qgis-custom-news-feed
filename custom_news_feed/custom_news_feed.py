@@ -332,21 +332,20 @@ class CustomNewsFeed:
         self.dockwidget.linksScrollArea.setWidgetResizable(True)
         self.dockwidget.linksScrollArea.setWidget(self.dockwidget.widget)
 
-
     def checkPublishingDate(self, startdate, enddate):
         """ Checks the date relevance of a news entry by its date range """
         ret = True
         now = datetime.now().isoformat()
 
-        if (startdate is not None) and (enddate is not None):
-            if startdate <= now and enddate >= now: ret = True
-            else: ret = False
-        if (startdate is not None) and (enddate is None):        
-            if startdate > now: ret = False
-        if (enddate is not None) and (startdate is None): 
-            if enddate < now: ret = False
+        if startdate and enddate:
+            return startdate <= now <= enddate
+        elif startdate:
+            return startdate <= now
+        elif enddate:
+            return now <= enddate
 
-        return ret
+        return True
+
 
     def check_hashfile(self, newsident) -> bool:
         """ Checks the existence of a hash file related to the news entry """
