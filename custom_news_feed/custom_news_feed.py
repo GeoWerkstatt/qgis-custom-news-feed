@@ -228,7 +228,7 @@ class CustomNewsFeed:
             self.iface.addTabifiedDockWidget(Qt.RightDockWidgetArea, self.dockwidget, raiseTab=True)
             self.dockwidget.show()
             self.forceShowGui = True
-            #self.dockwidget.close()
+            self.dockwidget.close()
         self.get_news()
 
 
@@ -284,6 +284,7 @@ class CustomNewsFeed:
             self.delete_hashfile(hash)
         else:                      
             self.create_hashfile(hash)
+        self.reloadNews
 
 
     def configure_pinned_message(self, pinnedMessageJson):
@@ -428,10 +429,10 @@ class CustomNewsFeed:
                                 if reply.error() == QNetworkReply.NoError:
                                     image.loadFromData(reply.content())
                                 else:
-                                    image = None;
+                                    image = None
                                     QgsMessageLog.logMessage(u'Error reading image ' + reply.errorString(),'Custom News Feed')
                             else:
-                                image = None;
+                                image = None
                                 QgsMessageLog.logMessage(u'Error reading image ' + blockingRequest.errorMessage(),'Custom News Feed')
                         else :
                             with open(imageUrl, 'rb') as file:
@@ -510,10 +511,10 @@ class CustomNewsFeed:
                                 if reply2.error() == QNetworkReply.NoError:
                                     image2.loadFromData(reply2.content())
                                 else:
-                                    image2 = None;
+                                    image2 = None
                                     QgsMessageLog.logMessage(u'Error reading image ' + reply2.errorString(),'Custom News Feed')
                             else:
-                                image2 = None;
+                                image2 = None
                                 QgsMessageLog.logMessage(u'Error reading image ' + blockingRequest2.errorMessage(),'Custom News Feed')
                         else :
                             with open(imageUrl2, 'rb') as file2:
@@ -550,7 +551,6 @@ class CustomNewsFeed:
                 left_inner_vbox2.addWidget(date2)
                 left_inner_vbox2.addWidget(text2)
                 left_inner_vbox2.addWidget(link2)
-                #left_inner_vbox2.addWidget(readbutton2)
                 left_inner_vbox2.setSpacing(2)
                 left_inner_vbox2.addStretch(1)
 
@@ -564,8 +564,9 @@ class CustomNewsFeed:
           
             self.dockwidget.tabWidget.setCurrentIndex(0)
 
-        #if left_inner_vbox.count() == 0: 
-        if (widgetcount == 0 and self.check_hashfile(hashlib.md5(str(self.current_pinned_message["Text"]).encode('utf-8')).hexdigest()) == True) and not self.forceShowGui:
+
+        #if (widgetcount == 0 and self.check_hashfile(hashlib.md5(str(self.current_pinned_message["Text"]).encode('utf-8')).hexdigest()) == True) and not self.forceShowGui:
+        if (widgetcount == 0 and self.check_hashfile(hashlib.md5(str(self.current_pinned_message["Text"]).encode('utf-8')).hexdigest()) == True):
             self.dockwidget.close()
             self.iface.messageBar().pushMessage("Warning", "Aktuell existieren keine ungelesenen Nachrichten", level=Qgis.Info)
         else:
