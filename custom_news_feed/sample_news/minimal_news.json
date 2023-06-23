@@ -1,8 +1,9 @@
 {
     "PanelTitle" : "Minimal News",
     "LinkSectionTitle" : "",
-    "PanelTitleFeed" : "news feed",
-    "PanelTitleFeedRepository" : "news repository",
+    "PanelTitleFeed" : "News",
+    "PanelTitleFeedRepository" : "News Repository",
+    "ReadButtonLabel" : "mark as read",
     "NewsArticles": [
         {
             "Title":"Birds are your friends",

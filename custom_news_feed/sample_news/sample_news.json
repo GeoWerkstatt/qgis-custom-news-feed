@@ -1,8 +1,9 @@
 {
     "PanelTitle" : "Your custom bird news",
     "LinkSectionTitle" : "Important links",
-    "PanelTitleFeed" : "news feed",
-    "PanelTitleFeedRepository" : "news repository",
+    "PanelTitleFeed" : "News",
+    "PanelTitleFeedRepository" : "News Repository",
+    "ReadButtonLabel" : "mark as read",
     "NewsArticles": [
         {
             "Title":"Birds are your friends",

@@ -19,6 +19,7 @@ The JSON-file used to display your custom news has the following properties.
     "PanelTitle" : string (mandatory),
     "PanelTitleFeed" : string (mandatory),
     "PanelTitleFeedRepository" : string (mandatory),
+    "ReadButtonLabel" : string (mandatory),
 
 #### Articles which will be displayed in the main section of the plugin window
     "NewsArticles": array of objects [
@@ -50,8 +51,8 @@ The JSON-file used to display your custom news has the following properties.
         "PinnedMessage": {
             "Text": string (optional),
             "Importance": 'high', 'medium' or 'low' (optional),
-            "StartPublishingDate": iso.datetime (like "2023-05-12T06:00:00.000Z", optional),
-            "EndPublishingDate": iso.datetime (like "2023-05-12T06:00:00.000Z", optional)
+            "StartPublishingDate": iso.datetime (like "2023-05-12T06:00:00.000Z", mandatory),
+            "EndPublishingDate": iso.datetime (like "2023-05-12T06:00:00.000Z", mandatory)
         }
 
 #### Label for the input box to select configuration file (locally or via url)
