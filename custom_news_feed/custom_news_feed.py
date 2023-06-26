@@ -80,6 +80,7 @@ class CustomNewsFeed:
         self.menu = self.tr(u'&Custom News Feed')
         self.toolbar = self.iface.addToolBar(u'CustomNewsFeed')
         self.toolbar.setObjectName(u'CustomNewsFeed')
+        self.settingspath = abspath(join(QgsApplication.qgisSettingsDirPath(), 'customnewsfeed'))
 
         #print "** INITIALIZING CustomNewsFeed"
         self.dockwidget = None
@@ -87,6 +88,7 @@ class CustomNewsFeed:
         # Signals and slots
         self.settings_dlg.browse_btn.clicked.connect(self.choose_file)
         self.current_pinned_message = ''
+
 
         # Add update interval to update news once a day
         self.timer = QTimer()
@@ -279,8 +281,8 @@ class CustomNewsFeed:
 
     def toggle_message_hashfile(self, event):
         """Toggles pinned messages resized/full-sized state"""
-        hash = hashlib.md5(str(self.current_pinned_message["Text"]).encode('utf-8')).hexdigest()
-        if self.check_hashfile(hash) == True :
+        hash = self.createHash(self.current_pinned_message["Text"])
+        if self.check_hashfile(hash) == True:
             self.delete_hashfile(hash)
         else:                      
             self.create_hashfile(hash)
@@ -292,7 +294,7 @@ class CustomNewsFeed:
         self.dockwidget.pinned_message.setVisible(False)
         self.dockwidget.pinned_message.mousePressEvent = self.toggle_message_hashfile
         self.dockwidget.pinned_message.setText(str(self.current_pinned_message["Text"]))
-        if self.check_hashfile(hashlib.md5(str(pinnedMessageJson["Text"]).encode('utf-8')).hexdigest()) == True :
+        if self.check_hashfile(self.createHash(pinnedMessageJson["Text"])) == True :
             self.dockwidget.pinned_message.setText(self.dockwidget.pinned_message.text()[:60]+ '...')
         else:
             self.dockwidget.pinned_message.setText(str(self.current_pinned_message["Text"]))
@@ -317,9 +319,8 @@ class CustomNewsFeed:
         self.dockwidget.linksScrollArea.setVisible(len(links) > 0)
         self.dockwidget.linkSectionLabel.setVisible(len(links) > 0)
         self.dockwidget.widget = QWidget()
-        self.dockwidget.widget2 = QWidget()
         self.dockwidget.vbox = QVBoxLayout()
-        self.dockwidget.vbox2 = QVBoxLayout()
+
         for link in links:
             label= QLabel("<a href=% s>% s</a>" % (link['Url'], link['LinkTitle']))
             label.setTextFormat(Qt.RichText)
@@ -347,28 +348,25 @@ class CustomNewsFeed:
         return True
 
 
-    def check_hashfile(self, newsident) -> bool:
+    def check_hashfile(self, newsidenty) -> bool:
         """ Checks the existence of a hash file related to the news entry """
-        path = abspath(join(QgsApplication.qgisSettingsDirPath(), 'customnewsfeed'))
-        filename = abspath(join(path, newsident))              
+        filename = abspath(join(self.settingspath, newsidenty))              
         if os.path.exists(filename):
             return True
         else:
             return False
 
-    def delete_hashfile(self, newsident):
+    def delete_hashfile(self, newsidenty):
         """ Deletes a hash file related to the news entry """
-        path = abspath(join(QgsApplication.qgisSettingsDirPath(), 'customnewsfeed'))
-        filename = abspath(join(path, newsident))
+        filename = abspath(join(self.settingspath, newsidenty))
         os.remove(filename)
         self.get_news()
 
     def create_hashfile(self, newsident):
         """ Creates a hash file related to the news entry """
-        path = abspath(join(QgsApplication.qgisSettingsDirPath(), 'customnewsfeed'))
-        filename = abspath(join(path, newsident))
+        filename = abspath(join(self.settingspath, newsident))
 
-        if not QDir(path).exists(): QDir().mkdir(path)
+        if not QDir(self.settingspath).exists(): QDir().mkdir(self.settingspath)
         if not QDir(filename): 
             file = open(filename, 'w')
             file.close()
@@ -379,7 +377,7 @@ class CustomNewsFeed:
         self.get_news()
 
     def addNews(self, newsArticles):
-        """ Add new articles to the news section of the plugin."""
+        """ Add new articles to the news and news repository section of the plugin."""
         self.dockwidget.widget = QWidget()
         self.dockwidget.widget2 = QWidget()
         self.dockwidget.vbox = QVBoxLayout()
@@ -393,7 +391,6 @@ class CustomNewsFeed:
             startdate = enddate = None
             if 'StartPublishingDate' in json.loads(json.dumps(newsArticle)): startdate = newsArticle['StartPublishingDate'] 
             if 'EndPublishingDate' in json.loads(json.dumps(newsArticle)): enddate = newsArticle['EndPublishingDate'] 
-            #if self.checkPublishingDate(startdate, enddate) == False: continue
 
             hbox = QHBoxLayout()
             left_inner_vbox = QVBoxLayout()
@@ -406,9 +403,9 @@ class CustomNewsFeed:
             self.dockwidget.vbox.setSpacing(20)
 
             # create hash as identifier
-            newsArticle['Hash'] = hashlib.md5(str(newsArticle['Title']+newsArticle['Date']).encode('utf-8')).hexdigest()
-
-            #check if hashfile exists (which indicates that the article is marked as read)
+            newsArticle['Hash'] = self.createHash(str(newsArticle['Title']+newsArticle['Date']))
+            
+            # check if hashfile exists (which indicates that the article is marked as read)
             if (self.check_hashfile(newsArticle['Hash']) == False and self.checkPublishingDate(startdate, enddate) == True):
 
                 text= QLabel(newsArticle['Text'])
@@ -453,7 +450,6 @@ class CustomNewsFeed:
                 title.setStyleSheet("font-weight: bold")
 
                 readbutton = QPushButton('als gelesen markieren')
-                #readbutton.setStyleSheet("qproperty-icon: url(:/path/to/images.png);");
                 readbutton.clicked.connect(partial(self.create_hashfile, newsArticle['Hash']))
                 readbutton.adjustSize()
 
@@ -471,7 +467,6 @@ class CustomNewsFeed:
                 left_inner_vbox.addWidget(readbutton)
                 left_inner_vbox.setSpacing(2)
                 widgetcount = widgetcount+1
-                #left_inner_vbox.addStretch(1)
 
                 self.dockwidget.vbox.addStretch(1)
 
@@ -481,7 +476,7 @@ class CustomNewsFeed:
                 self.dockwidget.newsScrollArea.setWidgetResizable(True)
                 self.dockwidget.newsScrollArea.setWidget(self.dockwidget.widget)
 
-
+            # put read and outdated messages to the repository news tab
             else:
 
                 hbox2 = QHBoxLayout()
@@ -535,10 +530,6 @@ class CustomNewsFeed:
                 title2 = QLabel(newsArticle['Title'])
                 title2.setStyleSheet("font-weight: bold")
 
-                #readbutton2 = QPushButton(newsArticle['Hash'])
-                #readbutton2.clicked.connect(partial(self.create_hashfile, readbutton2.text()))
-                #readbutton2.adjustSize()
-
                 date2 = QLabel(newsArticle['Date'])
                 date2.setStyleSheet("color: grey")
 
@@ -561,15 +552,15 @@ class CustomNewsFeed:
                 self.dockwidget.newsScrollArea2.setWidgetResizable(True) 
                 self.dockwidget.newsScrollArea2.setWidget(self.dockwidget.widget2)  
 
-                #dirty hack to refresh main tab in the case it is empty
+                # dirty hack to refresh main tab in the case it is empty
                 self.dockwidget.newsScrollArea.setWidget(self.dockwidget.widget)    
           
             self.dockwidget.tabWidget.setCurrentIndex(0)
 
-        if (widgetcount == 0 and self.check_hashfile(hashlib.md5(str(self.current_pinned_message["Text"]).encode('utf-8')).hexdigest())):
+        if (widgetcount == 0 and self.check_hashfile(self.createHash(self.current_pinned_message["Text"]))):
             self.dockwidget.close()
             self.iface.messageBar().pushMessage("Warning", "Aktuell existieren keine ungelesenen Nachrichten", level=Qgis.Info)
-        elif (widgetcount == 0 and not self.check_hashfile(hashlib.md5(str(self.current_pinned_message["Text"]).encode('utf-8')).hexdigest())):
+        elif (widgetcount == 0 and not self.check_hashfile(self.createHash(self.current_pinned_message["Text"]))):
             self.dockwidget.close()
         else:
             self.iface.messageBar().pushMessage("Info", "Es liegen neue Nachrichten vor!", level=Qgis.Info)                
@@ -577,6 +568,9 @@ class CustomNewsFeed:
         if self.forceShowGui and not self.dockwidget.isUserVisible():
             self.dockwidget.show()
         self.forceShowGui = False
+
+    def createHash(self, text):
+        return hashlib.md5(str(text).encode('utf-8')).hexdigest()
 
     def run_settings(self):
         """ Shows the settings dialog"""
