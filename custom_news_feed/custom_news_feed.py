@@ -23,18 +23,21 @@
 """
 import os.path
 import json
+import hashlib
 
-from qgis.PyQt.QtCore import QLocale, QTranslator, QCoreApplication, Qt, QTimer, QUrl
+from qgis.PyQt.QtCore import QLocale, QTranslator, QCoreApplication, Qt, QTimer, QUrl, QDir
 from qgis.PyQt.QtGui import QIcon, QPixmap, QImage
 from qgis.PyQt.QtNetwork import QNetworkReply, QNetworkRequest 
-from qgis.core import Qgis, QgsMessageLog, QgsBlockingNetworkRequest, QgsSettings
+from qgis.core import Qgis, QgsMessageLog, QgsBlockingNetworkRequest, QgsApplication, QgsSettings
 from qgis.PyQt.QtWidgets import QAction, QApplication, QWidget, \
                             QVBoxLayout, QHBoxLayout,\
-                            QLabel, QFileDialog
+                            QLabel, QFileDialog, QPushButton
 
 from .custom_news_feed_dockwidget import CustomNewsFeedDockWidget
 from .news_feed_settings_dialog import NewsFeedSettingsDialog
 from datetime import datetime
+from functools import partial
+from os.path import abspath, isdir, isfile, join
 
 class CustomNewsFeed:
     """QGIS Plugin Implementation."""
@@ -77,17 +80,19 @@ class CustomNewsFeed:
         self.menu = self.tr(u'&Custom News Feed')
         self.toolbar = self.iface.addToolBar(u'CustomNewsFeed')
         self.toolbar.setObjectName(u'CustomNewsFeed')
+        self.settingspath = abspath(join(QgsApplication.qgisSettingsDirPath(), 'customnewsfeed'))
 
         #print "** INITIALIZING CustomNewsFeed"
         self.dockwidget = None
 
         # Signals and slots
         self.settings_dlg.browse_btn.clicked.connect(self.choose_file)
+        self.current_pinned_message = ''
+
 
         # Add update interval to update news once a day
         self.timer = QTimer()
-        self.timer.timeout.connect(self.get_news)
-
+        self.timer.timeout.connect(self.reloadNews)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -170,6 +175,9 @@ class CustomNewsFeed:
 
         return action
 
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.clicked.emit()
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
@@ -221,6 +229,8 @@ class CustomNewsFeed:
         if not self.dockwidget.isUserVisible():
             self.iface.addTabifiedDockWidget(Qt.RightDockWidgetArea, self.dockwidget, raiseTab=True)
             self.dockwidget.show()
+            self.forceShowGui = True
+            self.dockwidget.close()
         self.get_news()
 
 
@@ -234,7 +244,6 @@ class CustomNewsFeed:
             news_json_file_path = os.path.join(self.plugin_dir, 'sample_news','sample_news.json')
         QgsMessageLog.logMessage(u'Reading feed from: ' + news_json_file_path,'Custom News Feed')
         self.display_news_content(news_json_file_path)
-        
 
 
     def display_news_content(self, news_json_file_path):
@@ -252,9 +261,12 @@ class CustomNewsFeed:
         try:
             self.timer.start(news['NewsRefreshInterval'] * 60000 ) # convert minutes in miliseconds
             self.dockwidget.setWindowTitle(news['PanelTitle'])
+            self.dockwidget.tabWidget.setTabText(0, news['PanelTitleFeed'])
+            self.dockwidget.tabWidget.setTabText(1, news['PanelTitleFeedRepository'])
             self.dockwidget.linkSectionLabel.setText(news['LinkSectionTitle'])
             self.settings_dlg.pathToConfigurationFileLabel.setText(news["PathToConfigurationFileLabel"])
             if self.checkPublishingDate(news["PinnedMessage"]['StartPublishingDate'],news["PinnedMessage"]['EndPublishingDate']) == True:
+                self.current_pinned_message = news["PinnedMessage"]
                 self.configure_pinned_message(news["PinnedMessage"])
             else:
                 self.dockwidget.pinned_message.setVisible(False)
@@ -267,11 +279,27 @@ class CustomNewsFeed:
             QgsMessageLog.logMessage(u'Error Reading Config file, missing field ' + str(e),'Custom News Feed')
 
 
+    def toggle_message_hashfile(self, event):
+        """Toggles pinned messages resized/full-sized state"""
+        hash = self.createHash(self.current_pinned_message["Text"])
+        if self.check_hashfile(hash) == True:
+            self.delete_hashfile(hash)
+        else:                      
+            self.create_hashfile(hash)
+        self.reloadNews
+
+
     def configure_pinned_message(self, pinnedMessageJson):
         """Adds pinned message to plugin in three possible styles."""
         self.dockwidget.pinned_message.setVisible(False)
-        self.dockwidget.pinned_message.setText(pinnedMessageJson["Text"])
-        if pinnedMessageJson["Text"] is not "":
+        self.dockwidget.pinned_message.mousePressEvent = self.toggle_message_hashfile
+        self.dockwidget.pinned_message.setText(str(self.current_pinned_message["Text"]))
+        if self.check_hashfile(self.createHash(pinnedMessageJson["Text"])) == True :
+            self.dockwidget.pinned_message.setText(self.dockwidget.pinned_message.text()[:60]+ '...')
+        else:
+            self.dockwidget.pinned_message.setText(str(self.current_pinned_message["Text"]))
+
+        if pinnedMessageJson["Text"] != "":
             self.dockwidget.pinned_message.setVisible(True)
         if pinnedMessageJson["Importance"]=="low" :
             self.dockwidget.pinned_message.setStyleSheet("background:rgb(154, 229, 114);padding:8px;")
@@ -292,6 +320,7 @@ class CustomNewsFeed:
         self.dockwidget.linkSectionLabel.setVisible(len(links) > 0)
         self.dockwidget.widget = QWidget()
         self.dockwidget.vbox = QVBoxLayout()
+
         for link in links:
             label= QLabel("<a href=% s>% s</a>" % (link['Url'], link['LinkTitle']))
             label.setTextFormat(Qt.RichText)
@@ -305,6 +334,8 @@ class CustomNewsFeed:
         self.dockwidget.linksScrollArea.setWidget(self.dockwidget.widget)
 
     def checkPublishingDate(self, startdate, enddate):
+        """ Checks the date relevance of a news entry by its date range """
+        ret = True
         now = datetime.now().isoformat()
 
         if startdate and enddate:
@@ -317,19 +348,50 @@ class CustomNewsFeed:
         return True
 
 
+    def check_hashfile(self, newsidenty) -> bool:
+        """ Checks the existence of a hash file related to the news entry """
+        filename = abspath(join(self.settingspath, newsidenty))              
+        if os.path.exists(filename):
+            return True
+        else:
+            return False
+
+    def delete_hashfile(self, newsidenty):
+        """ Deletes a hash file related to the news entry """
+        filename = abspath(join(self.settingspath, newsidenty))
+        os.remove(filename)
+        self.get_news()
+
+    def create_hashfile(self, newsident):
+        """ Creates a hash file related to the news entry """
+        filename = abspath(join(self.settingspath, newsident))
+
+        if not QDir(self.settingspath).exists(): QDir().mkdir(self.settingspath)
+        if not QDir(filename): 
+            file = open(filename, 'w')
+            file.close()
+        self.get_news()
+
+    def reloadNews(self):
+        self.forceShowGui = False
+        self.get_news()
+
     def addNews(self, newsArticles):
-        """ Add new articles to the news section of the plugin."""
+        """ Add new articles to the news and news repository section of the plugin."""
         self.dockwidget.widget = QWidget()
+        self.dockwidget.widget2 = QWidget()
         self.dockwidget.vbox = QVBoxLayout()
+        self.dockwidget.vbox2 = QVBoxLayout()
+
+        widgetcount=0
 
         for index, newsArticle in enumerate(newsArticles):
-            
+
             # check the existence of a publishing date range
             startdate = enddate = None
             if 'StartPublishingDate' in json.loads(json.dumps(newsArticle)): startdate = newsArticle['StartPublishingDate'] 
             if 'EndPublishingDate' in json.loads(json.dumps(newsArticle)): enddate = newsArticle['EndPublishingDate'] 
-            if self.checkPublishingDate(startdate, enddate) == False: continue
-            
+
             hbox = QHBoxLayout()
             left_inner_vbox = QVBoxLayout()
             right_inner_vbox = QVBoxLayout()
@@ -340,69 +402,175 @@ class CustomNewsFeed:
             self.dockwidget.vbox.setContentsMargins(15,15,15,15)
             self.dockwidget.vbox.setSpacing(20)
 
-            text= QLabel(newsArticle['Text'])
-            text.setWordWrap(True)
+            # create hash as identifier
+            newsArticle['Hash'] = self.createHash(str(newsArticle['Title']+newsArticle['Date']))
+            
+            # check if hashfile exists (which indicates that the article is marked as read)
+            if (self.check_hashfile(newsArticle['Hash']) == False and self.checkPublishingDate(startdate, enddate) == True):
 
-            if not newsArticle["ImageUrl"] == "":
-                image = QImage()
-                imageUrl = newsArticle["ImageUrl"]
-                try:
-                    if imageUrl[0:4].lower() == 'http':
-                        request = QNetworkRequest(QUrl(imageUrl))
-                        blockingRequest = QgsBlockingNetworkRequest()
-                        result = blockingRequest.get(request)
-                        if result == QgsBlockingNetworkRequest.NoError:
-                            reply = blockingRequest.reply()
-                            if reply.error() == QNetworkReply.NoError:
-                                image.loadFromData(reply.content())
+                text= QLabel(newsArticle['Text'])
+                text.setWordWrap(True)
+
+                if not newsArticle["ImageUrl"] == "":
+                    image = QImage()
+                    imageUrl = newsArticle["ImageUrl"]
+                    try:
+                        if imageUrl[0:4].lower() == 'http':
+                            request = QNetworkRequest(QUrl(imageUrl))
+                            blockingRequest = QgsBlockingNetworkRequest()
+                            result = blockingRequest.get(request)
+                            if result == QgsBlockingNetworkRequest.NoError:
+                                reply = blockingRequest.reply()
+                                if reply.error() == QNetworkReply.NoError:
+                                    image.loadFromData(reply.content())
+                                else:
+                                    image = None
+                                    QgsMessageLog.logMessage(u'Error reading image ' + reply.errorString(),'Custom News Feed')
                             else:
-                                image = None;
-                                QgsMessageLog.logMessage(u'Error reading image ' + reply.errorString(),'Custom News Feed')
-                        else:
-                            image = None;
-                            QgsMessageLog.logMessage(u'Error reading image ' + blockingRequest.errorMessage(),'Custom News Feed')
-                    else :
-                        with open(imageUrl, 'rb') as file:
-                            image.loadFromData(file.read())
-                except Exception as e:                                    
-                    self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
-                        self.tr(u'Das Bild mit der Url ') + imageUrl +
-                        self.tr(u' konnte nicht geladen werden. '),
-                        level = Qgis.Critical)
-                    QgsMessageLog.logMessage(u'Error reading image ' + str(e),'Custom News Feed')
-                if image is not None:
-                    image_label = QLabel()
-                    image_label.setFixedWidth(150)
-                    image_label.setPixmap(QPixmap(image).scaledToWidth(150, Qt.SmoothTransformation))
-                    right_inner_vbox.setContentsMargins(0,5,0,0)
-                    right_inner_vbox.addWidget(image_label)
-                    right_inner_vbox.addStretch(1)
+                                image = None
+                                QgsMessageLog.logMessage(u'Error reading image ' + blockingRequest.errorMessage(),'Custom News Feed')
+                        else :
+                            with open(imageUrl, 'rb') as file:
+                                image.loadFromData(file.read())
+                    except Exception as e:                                    
+                        self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
+                            self.tr(u'Das Bild mit der Url ') + imageUrl +
+                            self.tr(u' konnte nicht geladen werden. '),
+                            level = Qgis.Critical)
+                        QgsMessageLog.logMessage(u'Error reading image ' + str(e),'Custom News Feed')
+                    if image is not None:
+                        image_label = QLabel()
+                        image_label.setFixedWidth(150)
+                        image_label.setPixmap(QPixmap(image).scaledToWidth(150, Qt.SmoothTransformation))
+                        right_inner_vbox.setContentsMargins(0,5,0,0)
+                        right_inner_vbox.addWidget(image_label)
+                        right_inner_vbox.addStretch(1)
 
-            title = QLabel(newsArticle['Title'])
-            title.setStyleSheet("font-weight: bold")
+                title = QLabel(newsArticle['Title'])
+                title.setStyleSheet("font-weight: bold")
 
-            date = QLabel(newsArticle['Date'])
-            date.setStyleSheet("color: grey")
+                readbutton = QPushButton('als gelesen markieren')
+                readbutton.clicked.connect(partial(self.create_hashfile, newsArticle['Hash']))
+                readbutton.adjustSize()
 
-            link = QLabel("<a href=% s>% s</a>" % (newsArticle['LinkUrl'], newsArticle['LinkTitle']))
-            link.setTextFormat(Qt.RichText)
-            link.setOpenExternalLinks(True)
+                date = QLabel(newsArticle['Date'])
+                date.setStyleSheet("color: grey")
 
-            left_inner_vbox.addWidget(title)
-            left_inner_vbox.addWidget(date)
-            left_inner_vbox.addWidget(text)
-            left_inner_vbox.addWidget(link)
-            left_inner_vbox.setSpacing(2)
-            left_inner_vbox.addStretch(1)
+                link = QLabel("<a href=% s>% s</a>" % (newsArticle['LinkUrl'], newsArticle['LinkTitle']))
+                link.setTextFormat(Qt.RichText)
+                link.setOpenExternalLinks(True)
 
-        self.dockwidget.vbox.addStretch(1)
+                left_inner_vbox.addWidget(title)
+                left_inner_vbox.addWidget(date)
+                left_inner_vbox.addWidget(text)
+                left_inner_vbox.addWidget(link)
+                left_inner_vbox.addWidget(readbutton)
+                left_inner_vbox.setSpacing(2)
+                widgetcount = widgetcount+1
 
-        self.dockwidget.widget.setLayout(self.dockwidget.vbox)
-        self.dockwidget.newsScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.dockwidget.newsScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.dockwidget.newsScrollArea.setWidgetResizable(True)
-        self.dockwidget.newsScrollArea.setWidget(self.dockwidget.widget)
+                self.dockwidget.vbox.addStretch(1)
 
+                self.dockwidget.widget.setLayout(self.dockwidget.vbox)
+                self.dockwidget.newsScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                self.dockwidget.newsScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+                self.dockwidget.newsScrollArea.setWidgetResizable(True)
+                self.dockwidget.newsScrollArea.setWidget(self.dockwidget.widget)
+
+            # put read and outdated messages to the repository news tab
+            else:
+
+                hbox2 = QHBoxLayout()
+                left_inner_vbox2 = QVBoxLayout()
+                right_inner_vbox2 = QVBoxLayout()
+                hbox2.addLayout(left_inner_vbox2)
+                hbox2.addLayout(right_inner_vbox2)
+
+                self.dockwidget.vbox2.addLayout(hbox2)
+                self.dockwidget.vbox2.setContentsMargins(15,15,15,15)
+                self.dockwidget.vbox2.setSpacing(20)
+
+                text2= QLabel(newsArticle['Text'])
+                text2.setWordWrap(True)
+
+                if not newsArticle["ImageUrl"] == "":
+                    image2 = QImage()
+                    imageUrl2 = newsArticle["ImageUrl"]
+                    try:
+                        if imageUrl2[0:4].lower() == 'http':
+                            request2 = QNetworkRequest(QUrl(imageUrl2))
+                            blockingRequest2 = QgsBlockingNetworkRequest()
+                            result2 = blockingRequest2.get(request2)
+                            if result2 == QgsBlockingNetworkRequest.NoError:
+                                reply2 = blockingRequest2.reply()
+                                if reply2.error() == QNetworkReply.NoError:
+                                    image2.loadFromData(reply2.content())
+                                else:
+                                    image2 = None
+                                    QgsMessageLog.logMessage(u'Error reading image ' + reply2.errorString(),'Custom News Feed')
+                            else:
+                                image2 = None
+                                QgsMessageLog.logMessage(u'Error reading image ' + blockingRequest2.errorMessage(),'Custom News Feed')
+                        else :
+                            with open(imageUrl2, 'rb') as file2:
+                                image2.loadFromData(file2.read())
+                    except Exception as e:                                    
+                        self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
+                            self.tr(u'Das Bild mit der Url ') + imageUrl2 +
+                            self.tr(u' konnte nicht geladen werden. '),
+                            level = Qgis.Critical)
+                        QgsMessageLog.logMessage(u'Error reading image ' + str(e),'Custom News Feed')
+                    if image2 is not None:
+                        image_label2 = QLabel()
+                        image_label2.setFixedWidth(150)
+                        image_label2.setPixmap(QPixmap(image2).scaledToWidth(150, Qt.SmoothTransformation))
+                        right_inner_vbox2.setContentsMargins(0,5,0,0)
+                        right_inner_vbox2.addWidget(image_label2)
+                        right_inner_vbox2.addStretch(1)
+
+                title2 = QLabel(newsArticle['Title'])
+                title2.setStyleSheet("font-weight: bold")
+
+                date2 = QLabel(newsArticle['Date'])
+                date2.setStyleSheet("color: grey")
+
+                link2 = QLabel("<a href=% s>% s</a>" % (newsArticle['LinkUrl'], newsArticle['LinkTitle']))
+                link2.setTextFormat(Qt.RichText)
+                link2.setOpenExternalLinks(True)
+
+                left_inner_vbox2.addWidget(title2)
+                left_inner_vbox2.addWidget(date2)
+                left_inner_vbox2.addWidget(text2)
+                left_inner_vbox2.addWidget(link2)
+                left_inner_vbox2.setSpacing(2)
+                left_inner_vbox2.addStretch(1)
+
+                self.dockwidget.vbox2.addStretch(1)
+
+                self.dockwidget.widget2.setLayout(self.dockwidget.vbox2)
+                self.dockwidget.newsScrollArea2.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                self.dockwidget.newsScrollArea2.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+                self.dockwidget.newsScrollArea2.setWidgetResizable(True) 
+                self.dockwidget.newsScrollArea2.setWidget(self.dockwidget.widget2)  
+
+                # dirty hack to refresh main tab in the case it is empty
+                self.dockwidget.newsScrollArea.setWidget(self.dockwidget.widget)    
+          
+            self.dockwidget.tabWidget.setCurrentIndex(0)
+
+        if (widgetcount == 0 and self.check_hashfile(self.createHash(self.current_pinned_message["Text"]))):
+            self.dockwidget.close()
+            self.iface.messageBar().pushMessage("Warning", "Aktuell existieren keine ungelesenen Nachrichten", level=Qgis.Info)
+        elif (widgetcount == 0 and not self.check_hashfile(self.createHash(self.current_pinned_message["Text"]))):
+            self.dockwidget.close()
+        else:
+            self.iface.messageBar().pushMessage("Info", "Es liegen neue Nachrichten vor!", level=Qgis.Info)                
+
+        if self.forceShowGui and not self.dockwidget.isUserVisible():
+            self.dockwidget.show()
+        self.forceShowGui = False
+
+    def createHash(self, text):
+        return hashlib.md5(str(text).encode('utf-8')).hexdigest()
 
     def run_settings(self):
         """ Shows the settings dialog"""
@@ -415,7 +583,6 @@ class CustomNewsFeed:
             path = unicode(self.settings_dlg.config_json_path.text())
             self.settings.setValue("CustomNewsFeed/json_file_path", path)
             self.display_news_content(path)
-
 
     def choose_file(self):
         """Allows the user to choose a local path for the config file."""
