@@ -3,6 +3,8 @@
 ## What do I use Custom News Feed for?
 Custom News Feed is a [QGIS](https://www.qgis.org/en/site/) plugin that lets you display a feed of articles containing a title, date, text, image and link. The information to display is managed in a JSON-file, that can be provided locally or via url.
 Custom News Feed plugin is helpful if you want to distriubte news articles organisation-wide.
+News entries can be marked as read, so that they disappear. For news articles this can be done by clicking the related button. Pinned Messages can be shortened/extended by clicking onto the message field itself.
+News articles can have a start- and/or an end-publishing date. A pinned message needs to have such entries.
 
 ![](dockpane_preview.png)
 
@@ -19,6 +21,7 @@ The JSON-file used to display your custom news has the following properties.
     "PanelTitle" : string (mandatory),
     "PanelTitleFeed" : string (mandatory),
     "PanelTitleFeedRepository" : string (mandatory),
+    "ReadButtonLabel" : string (mandatory),
 
 #### Articles which will be displayed in the main section of the plugin window
     "NewsArticles": array of objects [
@@ -50,8 +53,8 @@ The JSON-file used to display your custom news has the following properties.
         "PinnedMessage": {
             "Text": string (optional),
             "Importance": 'high', 'medium' or 'low' (optional),
-            "StartPublishingDate": iso.datetime (like "2023-05-12T06:00:00.000Z", optional),
-            "EndPublishingDate": iso.datetime (like "2023-05-12T06:00:00.000Z", optional)
+            "StartPublishingDate": iso.datetime (like "2023-05-12T06:00:00.000Z", mandatory),
+            "EndPublishingDate": iso.datetime (like "2023-05-12T06:00:00.000Z", mandatory)
         }
 
 #### Label for the input box to select configuration file (locally or via url)

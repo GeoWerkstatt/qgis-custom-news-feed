@@ -259,6 +259,7 @@ class CustomNewsFeed:
                     level = Qgis.Critical)
             QgsMessageLog.logMessage(u'Error Initializing Config file ' + str(e),'Custom News Feed')
         try:
+            self.readbuttonlabel = news['ReadButtonLabel']
             self.timer.start(news['NewsRefreshInterval'] * 60000 ) # convert minutes in miliseconds
             self.dockwidget.setWindowTitle(news['PanelTitle'])
             self.dockwidget.tabWidget.setTabText(0, news['PanelTitleFeed'])
@@ -449,7 +450,7 @@ class CustomNewsFeed:
                 title = QLabel(newsArticle['Title'])
                 title.setStyleSheet("font-weight: bold")
 
-                readbutton = QPushButton('als gelesen markieren')
+                readbutton = QPushButton(self.readbuttonlabel)
                 readbutton.clicked.connect(partial(self.create_hashfile, newsArticle['Hash']))
                 readbutton.adjustSize()
 
