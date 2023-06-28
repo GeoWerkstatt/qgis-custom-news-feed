@@ -4,7 +4,7 @@
 Custom News Feed is a [QGIS](https://www.qgis.org/en/site/) plugin that lets you display a feed of articles containing a title, date, text, image and link. The information to display is managed in a JSON-file, that can be provided locally or via url.
 Custom News Feed plugin is helpful if you want to distriubte news articles organisation-wide.
 News entries can be marked as read, so that they disappear. For news articles this can be done by clicking the related button. Pinned Messages can be shortened/extended by clicking onto the message field itself.
-News articles can have a Start- and /or an End-Publishing date. A pinned message needs to have such entries.
+News articles can have a start- and/or an end-publishing date. A pinned message needs to have such entries.
 
 ![](dockpane_preview.png)
 
