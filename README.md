@@ -53,8 +53,8 @@ The JSON-file used to display your custom news has the following properties.
         "PinnedMessage": {
             "Text": string (optional),
             "Importance": 'high', 'medium' or 'low' (optional),
-            "StartPublishingDate": iso.datetime (like "2023-05-12T06:00:00.000Z", mandatory),
-            "EndPublishingDate": iso.datetime (like "2023-05-12T06:00:00.000Z", mandatory)
+            "StartPublishingDate": iso.datetime (like "2023-05-12T06:00:00.000Z", optional),
+            "EndPublishingDate": iso.datetime (like "2023-05-12T06:00:00.000Z", optional)
         }
 
 #### Label for the input box to select configuration file (locally or via url)

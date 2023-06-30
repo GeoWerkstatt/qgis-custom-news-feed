@@ -179,14 +179,19 @@ class CustomNewsFeed:
         if event.button() == Qt.LeftButton:
             self.clicked.emit()
 
+    def prerun(self):
+        self.forceShowGui = True
+        self.run()
+
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
+        self.forceShowGui = False
         self.run()
         icon_path = os.path.join(self.plugin_dir, 'icon.png')
         self.add_action(
             icon_path,
             text=self.tr(u'Neuigkeiten'),
-            callback=self.run,
+            callback=self.prerun,
             parent=self.iface.mainWindow())
 
         icon_path = os.path.join(self.plugin_dir, 'settings.png')
@@ -229,8 +234,8 @@ class CustomNewsFeed:
         if not self.dockwidget.isUserVisible():
             self.iface.addTabifiedDockWidget(Qt.RightDockWidgetArea, self.dockwidget, raiseTab=True)
             self.dockwidget.show()
-            self.forceShowGui = True
             self.dockwidget.close()
+
         self.get_news()
 
 
@@ -242,7 +247,7 @@ class CustomNewsFeed:
             news_json_file_path = self.settings.value("CustomNewsFeed/json_file_path", None)
         if not news_json_file_path:
             news_json_file_path = os.path.join(self.plugin_dir, 'sample_news','sample_news.json')
-        QgsMessageLog.logMessage(u'Reading feed from: ' + news_json_file_path,'Custom News Feed')
+        #QgsMessageLog.logMessage(u'Reading feed from: ' + news_json_file_path,'Custom News Feed')
         self.display_news_content(news_json_file_path)
 
 
@@ -266,13 +271,20 @@ class CustomNewsFeed:
             self.dockwidget.tabWidget.setTabText(1, news['PanelTitleFeedRepository'])
             self.dockwidget.linkSectionLabel.setText(news['LinkSectionTitle'])
             self.settings_dlg.pathToConfigurationFileLabel.setText(news["PathToConfigurationFileLabel"])
-            if self.checkPublishingDate(news["PinnedMessage"]['StartPublishingDate'],news["PinnedMessage"]['EndPublishingDate']) == True:
-                self.current_pinned_message = news["PinnedMessage"]
-                self.configure_pinned_message(news["PinnedMessage"])
+
+            self.current_pinned_message = news["PinnedMessage"]
+            if 'StartPublishingDate' in json.loads(json.dumps(news["PinnedMessage"])) and 'EndPublishingDate' in json.loads(json.dumps(news["PinnedMessage"])):
+                if self.checkPublishingDate(news["PinnedMessage"]['StartPublishingDate'],news["PinnedMessage"]['EndPublishingDate']) == True:
+                    #self.current_pinned_message = news["PinnedMessage"]
+                    self.configure_pinned_message(news["PinnedMessage"])
+                else:
+                    self.dockwidget.pinned_message.setVisible(False)
             else:
-                self.dockwidget.pinned_message.setVisible(False)
+                self.configure_pinned_message(news["PinnedMessage"])
+
             self.addNews(news["NewsArticles"])
             self.addLinks(news["Links"])
+
         except Exception as e:
             self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
                     self.tr(u'Das Feld ' + str(e) + ' ist im angegebenen JSON-file nicht vorhanden.'),
@@ -568,6 +580,7 @@ class CustomNewsFeed:
 
         if self.forceShowGui and not self.dockwidget.isUserVisible():
             self.dockwidget.show()
+
         self.forceShowGui = False
 
     def createHash(self, text):
