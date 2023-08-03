@@ -247,7 +247,6 @@ class CustomNewsFeed:
             news_json_file_path = self.settings.value("CustomNewsFeed/json_file_path", None)
         if not news_json_file_path:
             news_json_file_path = os.path.join(self.plugin_dir, 'sample_news','sample_news.json')
-        #QgsMessageLog.logMessage(u'Reading feed from: ' + news_json_file_path,'Custom News Feed')
         self.display_news_content(news_json_file_path)
 
 
@@ -273,9 +272,10 @@ class CustomNewsFeed:
             self.settings_dlg.pathToConfigurationFileLabel.setText(news["PathToConfigurationFileLabel"])
 
             self.current_pinned_message = news["PinnedMessage"]
-            if 'StartPublishingDate' in json.loads(json.dumps(news["PinnedMessage"])) and 'EndPublishingDate' in json.loads(json.dumps(news["PinnedMessage"])):
+            pinnedmessage = json.dumps(news["PinnedMessage"])
+
+            if 'StartPublishingDate' in json.loads(pinnedmessage) and 'EndPublishingDate' in json.loads(pinnedmessage):
                 if self.checkPublishingDate(news["PinnedMessage"]['StartPublishingDate'],news["PinnedMessage"]['EndPublishingDate']) == True:
-                    #self.current_pinned_message = news["PinnedMessage"]
                     self.configure_pinned_message(news["PinnedMessage"])
                 else:
                     self.dockwidget.pinned_message.setVisible(False)
@@ -566,9 +566,10 @@ class CustomNewsFeed:
                 self.dockwidget.newsScrollArea2.setWidget(self.dockwidget.widget2)  
 
                 # dirty hack to refresh main tab in the case it is empty
-                self.dockwidget.newsScrollArea.setWidget(self.dockwidget.widget)    
+                self.dockwidget.newsScrollArea.setWidget(self.dockwidget.widget)   
           
             self.dockwidget.tabWidget.setCurrentIndex(0)
+            self.dockwidget.setFocus() 
 
         if (widgetcount == 0 and self.check_hashfile(self.createHash(self.current_pinned_message["Text"]))):
             self.dockwidget.close()
@@ -576,7 +577,8 @@ class CustomNewsFeed:
         elif (widgetcount == 0 and not self.check_hashfile(self.createHash(self.current_pinned_message["Text"]))):
             self.dockwidget.close()
         else:
-            self.iface.messageBar().pushMessage("Info", "Es liegen neue Nachrichten vor!", level=Qgis.Info)                
+            self.iface.messageBar().pushMessage("Info", "Es liegen neue Nachrichten vor!", level=Qgis.Info)  
+            # self.dockwidget.show()              
 
         if self.forceShowGui and not self.dockwidget.isUserVisible():
             self.dockwidget.show()
