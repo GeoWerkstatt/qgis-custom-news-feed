@@ -577,8 +577,7 @@ class CustomNewsFeed:
         elif (widgetcount == 0 and not self.check_hashfile(self.createHash(self.current_pinned_message["Text"]))):
             self.dockwidget.close()
         else:
-            self.iface.messageBar().pushMessage("Info", "Es liegen neue Nachrichten vor!", level=Qgis.Info)  
-            # self.dockwidget.show()              
+            self.iface.messageBar().pushMessage("Info", "Es liegen neue Nachrichten vor!", level=Qgis.Info)              
 
         if self.forceShowGui and not self.dockwidget.isUserVisible():
             self.dockwidget.show()
