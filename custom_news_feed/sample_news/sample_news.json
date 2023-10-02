@@ -1,89 +1,89 @@
 {
-    "PanelTitle" : "Your custom bird news",
-    "LinkSectionTitle" : "Important links",
-    "PanelTitleFeed" : "News",
-    "PanelTitleFeedRepository" : "News Repository",
-    "ReadButtonLabel" : "mark as read",
-    "NewsArticles": [
-        {
-            "Title":"Birds are your friends",
-            "Date":"2022-01-05",
-            "Text":"Based on fossil and biological evidence, most scientists accept that birds are a specialised subgroup of theropod dinosaurs and, more specifically, members of Maniraptora, a group of theropods which includes dromaeosaurids and oviraptorosaurs, among others. As scientists have discovered more theropods closely related to birds, the previously clear distinction between non-birds and birds has become blurred. Recent discoveries in the Liaoning Province of northeast China, which demonstrate many small theropod feathered dinosaurs, contribute to this ambiguity.",
-            "LinkUrl":"https://en.wikipedia.org/wiki/Nesting_instinct",
-            "LinkTitle": "More about nesting",
-            "ImageUrl": "https://p0.pxfuel.com/preview/127/71/605/pygmy-bird-of-prey-bird-wild-animal.jpg",
-            "StartPublishingDate": "2023-05-05T06:00:00.000Z",
-            "EndPublishingDate": "2023-12-31T23:59:59.000Z"
-        },
-        {
-            "Title":"The story about the chicken and the egg",
-            "Date":"2022-02-05",
-            "Text": "Many social species pass on knowledge across generations, which is considered a form of culture. Birds are social, communicating with visual signals, calls, and songs, and participating in such behaviours as cooperative breeding and hunting, flocking, and mobbing of predators. The vast majority of bird species are socially (but not necessarily sexually) monogamous, usually for one breeding season at a time, sometimes for years, and rarely for life. Other species have breeding systems that are polygynous (one male with many females) or, rarely, polyandrous (one female with many males). Birds produce offspring by laying eggs which are fertilised through sexual reproduction. They are usually laid in a nest and incubated by the parents. Most birds have an extended period of parental care after hatching.",
-            "LinkUrl":"",
-            "LinkTitle": "",
-            "ImageUrl": ""
-        },
-        {
-            "Title":"How to build a nest in 3 simple steps.",
-            "Date":"2022-03-05",
-            "Text":"Many species of birds are economically important as food for human consumption and raw material in manufacturing, with domesticated and undomesticated birds being important sources of eggs, meat, and feathers. Songbirds, parrots, and other species are popular as pets. Guano (bird excrement) is harvested for use as a fertiliser. Birds figure throughout human culture. About 120 to 130 species have become extinct due to human activity since the 17th century, and hundreds more before then. Human activity threatens about 1,200 bird species with extinction, though efforts are underway to protect them. Recreational birdwatching is an important part of the ecotourism industry.",
-            "LinkUrl":"https://en.wikipedia.org/wiki/Beak",
-            "LinkTitle": "Learn about beaks",
-            "ImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQp7KWxTpMgRpXlvzCgM8Q4Jukt3oaZBNuPKA&usqp=CAU",
-            "StartPublishingDate": "2023-05-12T06:00:00.000Z"
-        },
-        {
-            "Title":"The sparrow",
-            "Date":"2022-03-05",
-            "Text":"Based on fossil and biological evidence, most scientists accept that birds are a specialised subgroup of theropod dinosaurs and, more specifically, members of Maniraptora, a group of theropods which includes dromaeosaurids and oviraptorosaurs, among others. As scientists have discovered more theropods closely related to birds, the previously clear distinction between non-birds and birds has become blurred. Recent discoveries in the Liaoning Province of northeast China, which demonstrate many small theropod feathered dinosaurs, contribute to this ambiguity.",
-            "LinkUrl":"",
-            "LinkTitle": "",
-            "ImageUrl": "https://pixnio.com/free-images/2017/11/09/2017-11-09-19-25-59-550x367.jpg",
-            "EndPublishingDate": "2025-05-12T23:59:59.000Z"
-        },
-        {
-            "Title":"Do birds of the feather really flock together?",
-            "Date":"2022-03-05",
-            "Text": "Many social species pass on knowledge across generations, which is considered a form of culture. Birds are social, communicating with visual signals, calls, and songs, and participating in such behaviours as cooperative breeding and hunting, flocking, and mobbing of predators. The vast majority of bird species are socially (but not necessarily sexually) monogamous, usually for one breeding season at a time, sometimes for years, and rarely for life. Other species have breeding systems that are polygynous (one male with many females) or, rarely, polyandrous (one female with many males). Birds produce offspring by laying eggs which are fertilised through sexual reproduction. They are usually laid in a nest and incubated by the parents. Most birds have an extended period of parental care after hatching.",
-            "LinkUrl":"",
-            "LinkTitle": "",
-            "ImageUrl": "https://live.staticflickr.com/3382/3295094303_2b50e5fe03_b.jpg"
-        },
-        {            
-            "Title":"Why can't we fly?",
-            "Date":"2022-03-05",
-            "Text":"Many species of birds are economically important as food for human consumption and raw material in manufacturing, with domesticated and undomesticated birds being important sources of eggs, meat, and feathers. Songbirds, parrots, and other species are popular as pets. Guano (bird excrement) is harvested for use as a fertiliser. Birds figure throughout human culture. About 120 to 130 species have become extinct due to human activity since the 17th century, and hundreds more before then. Human activity threatens about 1,200 bird species with extinction, though efforts are underway to protect them. Recreational birdwatching is an important part of the ecotourism industry.",
-            "LinkUrl":"",
-            "LinkTitle": "",
-            "ImageUrl": "https://img.rawpixel.com/s3fs-private/rawpixel_images/website_content/wk42248487-image-kp6cmabf.jpg?w=800&dpr=1&fit=default&crop=default&q=65&vib=3&con=3&usm=15&bg=F4F4F3&ixlib=js-2.2.1&s=a41edfc319f3d1abf587ec82e0001b59"
-        }
-    ],
-             
-    "Links": [
-        {
-            "Url":"https://en.wikipedia.org/wiki/Bird",
-            "LinkTitle": "Everything else about birds"
-        },
-        {
-            "Url":"https://en.wikipedia.org/wiki/Bird",
-            "LinkTitle": "You really need to read this"
-        },
-        {
-            "Url":"https://en.wikipedia.org/wiki/The_Birds_(band)",
-            "LinkTitle": "Listen to this"
-        },
-        {
-            "Url":"https://en.wikipedia.org/wiki/The_Byrds",
-            "LinkTitle": "Or maybe even this"
-        }
-    ],
-
-    "PinnedMessage": {
-        "Text":"Message of medium importance: A small number of species, such as ducks and geese, lose all of their flight feathers at once, temporarily becoming flightless.",
-        "Importance": "medium",
-        "StartPublishingDate": "2023-05-05T06:00:00.000Z",
-        "EndPublishingDate": "2026-05-30T23:59:59.000Z"
+  "PanelTitle": "Your custom bird news",
+  "LinkSectionTitle": "Important links",
+  "PanelTitleFeed": "News",
+  "PanelTitleFeedRepository": "News Repository",
+  "ReadButtonLabel": "mark as read",
+  "NewsArticles": [
+    {
+      "Title": "Birds are your friends",
+      "Date": "2022-01-05",
+      "Text": "Based on fossil and biological evidence, most scientists accept that birds are a specialised subgroup of theropod dinosaurs and, more specifically, members of Maniraptora, a group of theropods which includes dromaeosaurids and oviraptorosaurs, among others. As scientists have discovered more theropods closely related to birds, the previously clear distinction between non-birds and birds has become blurred. Recent discoveries in the Liaoning Province of northeast China, which demonstrate many small theropod feathered dinosaurs, contribute to this ambiguity.",
+      "LinkUrl": "https://en.wikipedia.org/wiki/Nesting_instinct",
+      "LinkTitle": "More about nesting",
+      "ImageUrl": "https://p0.pxfuel.com/preview/127/71/605/pygmy-bird-of-prey-bird-wild-animal.jpg",
+      "StartPublishingDate": "2023-05-05T06:00:00.000Z",
+      "EndPublishingDate": "2023-12-31T23:59:59.000Z"
     },
-    "PathToConfigurationFileLabel": "Enter path or url for the JSON-configuration",
-    "NewsRefreshInterval": 60
+    {
+      "Title": "The story about the chicken and the egg",
+      "Date": "2022-02-05",
+      "Text": "Many social species pass on knowledge across generations, which is considered a form of culture. Birds are social, communicating with visual signals, calls, and songs, and participating in such behaviours as cooperative breeding and hunting, flocking, and mobbing of predators. The vast majority of bird species are socially (but not necessarily sexually) monogamous, usually for one breeding season at a time, sometimes for years, and rarely for life. Other species have breeding systems that are polygynous (one male with many females) or, rarely, polyandrous (one female with many males). Birds produce offspring by laying eggs which are fertilised through sexual reproduction. They are usually laid in a nest and incubated by the parents. Most birds have an extended period of parental care after hatching.",
+      "LinkUrl": "",
+      "LinkTitle": "",
+      "ImageUrl": ""
+    },
+    {
+      "Title": "How to build a nest in 3 simple steps.",
+      "Date": "2022-03-05",
+      "Text": "Many species of birds are economically important as food for human consumption and raw material in manufacturing, with domesticated and undomesticated birds being important sources of eggs, meat, and feathers. Songbirds, parrots, and other species are popular as pets. Guano (bird excrement) is harvested for use as a fertiliser. Birds figure throughout human culture. About 120 to 130 species have become extinct due to human activity since the 17th century, and hundreds more before then. Human activity threatens about 1,200 bird species with extinction, though efforts are underway to protect them. Recreational birdwatching is an important part of the ecotourism industry.",
+      "LinkUrl": "https://en.wikipedia.org/wiki/Beak",
+      "LinkTitle": "Learn about beaks",
+      "ImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQp7KWxTpMgRpXlvzCgM8Q4Jukt3oaZBNuPKA&usqp=CAU",
+      "StartPublishingDate": "2023-05-12T06:00:00.000Z"
+    },
+    {
+      "Title": "The sparrow",
+      "Date": "2022-03-05",
+      "Text": "Based on fossil and biological evidence, most scientists accept that birds are a specialised subgroup of theropod dinosaurs and, more specifically, members of Maniraptora, a group of theropods which includes dromaeosaurids and oviraptorosaurs, among others. As scientists have discovered more theropods closely related to birds, the previously clear distinction between non-birds and birds has become blurred. Recent discoveries in the Liaoning Province of northeast China, which demonstrate many small theropod feathered dinosaurs, contribute to this ambiguity.",
+      "LinkUrl": "",
+      "LinkTitle": "",
+      "ImageUrl": "https://pixnio.com/free-images/2017/11/09/2017-11-09-19-25-59-550x367.jpg",
+      "EndPublishingDate": "2025-05-12T23:59:59.000Z"
+    },
+    {
+      "Title": "Do birds of the feather really flock together?",
+      "Date": "2022-03-05",
+      "Text": "Many social species pass on knowledge across generations, which is considered a form of culture. Birds are social, communicating with visual signals, calls, and songs, and participating in such behaviours as cooperative breeding and hunting, flocking, and mobbing of predators. The vast majority of bird species are socially (but not necessarily sexually) monogamous, usually for one breeding season at a time, sometimes for years, and rarely for life. Other species have breeding systems that are polygynous (one male with many females) or, rarely, polyandrous (one female with many males). Birds produce offspring by laying eggs which are fertilised through sexual reproduction. They are usually laid in a nest and incubated by the parents. Most birds have an extended period of parental care after hatching.",
+      "LinkUrl": "",
+      "LinkTitle": "",
+      "ImageUrl": "https://live.staticflickr.com/3382/3295094303_2b50e5fe03_b.jpg"
+    },
+    {
+      "Title": "Why can't we fly?",
+      "Date": "2022-03-05",
+      "Text": "Many species of birds are economically important as food for human consumption and raw material in manufacturing, with domesticated and undomesticated birds being important sources of eggs, meat, and feathers. Songbirds, parrots, and other species are popular as pets. Guano (bird excrement) is harvested for use as a fertiliser. Birds figure throughout human culture. About 120 to 130 species have become extinct due to human activity since the 17th century, and hundreds more before then. Human activity threatens about 1,200 bird species with extinction, though efforts are underway to protect them. Recreational birdwatching is an important part of the ecotourism industry.",
+      "LinkUrl": "",
+      "LinkTitle": "",
+      "ImageUrl": "https://img.rawpixel.com/s3fs-private/rawpixel_images/website_content/wk42248487-image-kp6cmabf.jpg?w=800&dpr=1&fit=default&crop=default&q=65&vib=3&con=3&usm=15&bg=F4F4F3&ixlib=js-2.2.1&s=a41edfc319f3d1abf587ec82e0001b59"
+    }
+  ],
+
+  "Links": [
+    {
+      "Url": "https://en.wikipedia.org/wiki/Bird",
+      "LinkTitle": "Everything else about birds"
+    },
+    {
+      "Url": "https://en.wikipedia.org/wiki/Bird",
+      "LinkTitle": "You really need to read this"
+    },
+    {
+      "Url": "https://en.wikipedia.org/wiki/The_Birds_(band)",
+      "LinkTitle": "Listen to this"
+    },
+    {
+      "Url": "https://en.wikipedia.org/wiki/The_Byrds",
+      "LinkTitle": "Or maybe even this"
+    }
+  ],
+
+  "PinnedMessage": {
+    "Text": "Message of medium importance: A small number of species, such as ducks and geese, lose all of their flight feathers at once, temporarily becoming flightless.",
+    "Importance": "medium",
+    "StartPublishingDate": "2023-05-05T06:00:00.000Z",
+    "EndPublishingDate": "2026-05-30T23:59:59.000Z"
+  },
+  "PathToConfigurationFileLabel": "Enter path or url for the JSON-configuration",
+  "NewsRefreshInterval": 60
 }
