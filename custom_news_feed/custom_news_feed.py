@@ -264,6 +264,7 @@ class CustomNewsFeed:
             QgsMessageLog.logMessage(u'Error Initializing Config file ' + str(e),'Custom News Feed')
         try:
             self.readbuttonlabel = news['ReadButtonLabel']
+            self.readallbuttonlabel = news["ReadAllButtonLabel"]
             self.timer.start(news['NewsRefreshInterval'] * 60000 ) # convert minutes in miliseconds
             self.dockwidget.setWindowTitle(news['PanelTitle'])
             self.dockwidget.tabWidget.setTabText(0, news['PanelTitleFeed'])
@@ -375,7 +376,7 @@ class CustomNewsFeed:
         os.remove(filename)
         self.get_news()
 
-    def create_hashfile(self, newsident):
+    def create_hashfile(self, newsident, noReload=False):
         """ Creates a hash file related to the news entry """
         filename = abspath(join(self.settingspath, newsident))
 
@@ -383,7 +384,23 @@ class CustomNewsFeed:
         if not QDir(filename): 
             file = open(filename, 'w')
             file.close()
+        if noReload is not True:
+            self.get_news()
+
+    def mark_all_as_read(self, newsArticles):
+        """Mark all news as read"""
+        for index, newsArticle in enumerate(newsArticles):
+            startdate, enddate = self.getStartEndDate(newsArticle)
+            if self.check_hashfile(newsArticle["Hash"]) == False and self.checkPublishingDate(startdate, enddate) == True:
+                self.create_hashfile(newsArticle["Hash"], True)
         self.get_news()
+		
+    def getStartEndDate(self, newsArticle):
+        """Check the existence of a publishing date range"""
+        startdate = enddate = None
+        if 'StartPublishingDate' in json.loads(json.dumps(newsArticle)): startdate = newsArticle['StartPublishingDate'] 
+        if 'EndPublishingDate' in json.loads(json.dumps(newsArticle)): enddate = newsArticle['EndPublishingDate']
+        return startdate, enddate
 
     def reloadNews(self):
         self.forceShowGui = False
@@ -399,11 +416,7 @@ class CustomNewsFeed:
         widgetcount=0
 
         for index, newsArticle in enumerate(newsArticles):
-
-            # check the existence of a publishing date range
-            startdate = enddate = None
-            if 'StartPublishingDate' in json.loads(json.dumps(newsArticle)): startdate = newsArticle['StartPublishingDate'] 
-            if 'EndPublishingDate' in json.loads(json.dumps(newsArticle)): enddate = newsArticle['EndPublishingDate'] 
+            startdate, enddate = self.getStartEndDate(newsArticle)
 
             hbox = QHBoxLayout()
             left_inner_vbox = QVBoxLayout()
@@ -570,6 +583,10 @@ class CustomNewsFeed:
           
             self.dockwidget.tabWidget.setCurrentIndex(0)
             self.dockwidget.setFocus() 
+        
+        self.dockwidget.readAllButton.setText(self.readallbuttonlabel)
+        self.dockwidget.readAllButton.clicked.connect(partial(self.mark_all_as_read, newsArticles))
+        self.dockwidget.readAllButton.setDisabled(widgetcount == 0)
 
         if (widgetcount == 0 and self.check_hashfile(self.createHash(self.current_pinned_message["Text"]))):
             self.dockwidget.close()

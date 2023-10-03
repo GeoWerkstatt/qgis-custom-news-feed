@@ -22,6 +22,7 @@ The JSON-file used to display your custom news has the following properties.
     "PanelTitleFeed" : string (mandatory),
     "PanelTitleFeedRepository" : string (mandatory),
     "ReadButtonLabel" : string (mandatory),
+    "ReadAllButtonLabel" : string (mandatory),
 
 #### Articles which will be displayed in the main section of the plugin window
     "NewsArticles": array of objects [

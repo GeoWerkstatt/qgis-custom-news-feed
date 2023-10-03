@@ -4,6 +4,7 @@
   "PanelTitleFeed": "News",
   "PanelTitleFeedRepository": "News Repository",
   "ReadButtonLabel": "mark as read",
+  "ReadAllButtonLabel": "mark all as read",
   "NewsArticles": [
     {
       "Title": "Birds are your friends",
