@@ -271,6 +271,7 @@ class CustomNewsFeed:
             self.dockwidget.tabWidget.setTabText(1, news['PanelTitleFeedRepository'])
             self.dockwidget.linkSectionLabel.setText(news['LinkSectionTitle'])
             self.settings_dlg.pathToConfigurationFileLabel.setText(news["PathToConfigurationFileLabel"])
+            self.settings_dlg.openPanelOnNewsCheckBox.setText(news["OpenPanelOnNewsCheckBoxLabel"])
 
             self.current_pinned_message = news["PinnedMessage"]
             pinnedmessage = json.dumps(news["PinnedMessage"])
@@ -594,7 +595,9 @@ class CustomNewsFeed:
         elif (widgetcount == 0 and not self.check_hashfile(self.createHash(self.current_pinned_message["Text"]))):
             self.dockwidget.close()
         else:
-            self.iface.messageBar().pushMessage("Info", "Es liegen neue Nachrichten vor!", level=Qgis.Info)              
+            self.iface.messageBar().pushMessage("Info", "Es liegen neue Nachrichten vor!", level=Qgis.Info)
+            if self.forceShowGui is False:
+                self.forceShowGui = self.settings_dlg.openPanelOnNewsCheckBox.checkState() == Qt.Checked
 
         if self.forceShowGui and not self.dockwidget.isUserVisible():
             self.dockwidget.show()
@@ -607,6 +610,7 @@ class CustomNewsFeed:
     def run_settings(self):
         """ Shows the settings dialog"""
         self.settings_dlg.config_json_path.setText(self.settings.value("CustomNewsFeed/json_file_path", ""))
+        self.settings_dlg.openPanelOnNewsCheckBox.setCheckState(int(self.settings.value("CustomNewsFeed/open_on_news", Qt.Checked)))
         if self.settings_dlg.config_json_path.text() == "":
             self.settings_dlg.config_json_path.setPlaceholderText("https://")
         self.settings_dlg.show()
@@ -614,6 +618,7 @@ class CustomNewsFeed:
         if result:
             path = unicode(self.settings_dlg.config_json_path.text())
             self.settings.setValue("CustomNewsFeed/json_file_path", path)
+            self.settings.setValue("CustomNewsFeed/open_on_news", self.settings_dlg.openPanelOnNewsCheckBox.checkState())
             self.display_news_content(path)
 
     def choose_file(self):
