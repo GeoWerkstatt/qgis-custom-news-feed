@@ -69,6 +69,10 @@ The JSON-file used to display your custom news has the following properties.
 
         "PathToConfigurationFileLabel": string (optional),
 
+#### Label for the checkbox to open the plugin window automatically when a new news article is available
+
+        "OpenPanelOnNewsCheckBoxLabel": string (optional),
+
 #### Time interval (in minutes) after which the plugin rereads the configuration file
 
         "NewsRefreshInterval": 60
