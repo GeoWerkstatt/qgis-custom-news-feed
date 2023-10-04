@@ -141,3 +141,4 @@ cython_debug/
 .vscode/
 *.code-workspace
 *.ps1
+!.vscode/launch.json
