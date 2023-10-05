@@ -677,7 +677,7 @@ class CustomNewsFeed:
             self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
                 self.tr(u'Die Datei ') + path +
                 self.tr(u' konnte nicht gelesen werden. ') +
-                self.tr(u'Mehr Informationen im QGis message log. Beispielhafe News werden angezeigt.'),
+                self.tr(u'Mehr Informationen im QGis message log. Beispielhafte News werden angezeigt.'),
                 level = Qgis.Critical)
             QgsMessageLog.logMessage(u'Error reading file ' + str(e),'Custom News Feed')
             with open(os.path.join(self.plugin_dir, 'sample_news','sample_news.json'),'r', encoding='utf-8') as f:
