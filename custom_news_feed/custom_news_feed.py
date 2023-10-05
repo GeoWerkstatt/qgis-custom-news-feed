@@ -398,11 +398,13 @@ class CustomNewsFeed:
 
     def mark_all_as_read(self, newsArticles):
         """Mark all news as read"""
+        QApplication.setOverrideCursor(Qt.WaitCursor)
         for index, newsArticle in enumerate(newsArticles):
             startdate, enddate = self.getStartEndDate(newsArticle)
             if self.check_hashfile(newsArticle["Hash"]) == False and self.checkPublishingDate(startdate, enddate) == True:
                 self.create_hashfile(newsArticle["Hash"], True)
         self.get_news()
+        QApplication.restoreOverrideCursor()
 		
     def getStartEndDate(self, newsArticle):
         """Check the existence of a publishing date range"""
