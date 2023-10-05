@@ -429,7 +429,6 @@ class CustomNewsFeed:
             previousNewsArcticles = previousNewsJson["NewsArticles"]
             hasNewArticles = False
         else:
-            previousNewsArcticles = []
             hasNewArticles = True
 
         for index, newsArticle in enumerate(newsArticles):
