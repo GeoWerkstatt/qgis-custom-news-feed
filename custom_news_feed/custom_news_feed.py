@@ -266,7 +266,7 @@ class CustomNewsFeed:
     def display_news_content(self, news_json_file_path):
         """Display content of JSON-file in plugin."""
         try:
-            news = self.load_json_from_file(self, news_json_file_path)
+            news = self.load_json_from_file(news_json_file_path)
             self.readbuttonlabel = news['ReadButtonLabel']
             self.readallbuttonlabel = news["ReadAllButtonLabel"]
             self.timer.start(news['NewsRefreshInterval'] * 60000 ) # convert minutes in miliseconds
