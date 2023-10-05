@@ -277,17 +277,7 @@ class CustomNewsFeed:
             self.settings_dlg.pathToConfigurationFileLabel.setText(news["PathToConfigurationFileLabel"])
             self.settings_dlg.openPanelOnNewsCheckBox.setText(news["OpenPanelOnNewsCheckBoxLabel"])
 
-            self.current_pinned_message = news["PinnedMessage"]
-            pinnedmessage = json.dumps(news["PinnedMessage"])
-
-            if 'StartPublishingDate' in json.loads(pinnedmessage) and 'EndPublishingDate' in json.loads(pinnedmessage):
-                if self.checkPublishingDate(news["PinnedMessage"]['StartPublishingDate'],news["PinnedMessage"]['EndPublishingDate']) == True:
-                    self.configure_pinned_message(news["PinnedMessage"])
-                else:
-                    self.dockwidget.pinned_message.setVisible(False)
-            else:
-                self.configure_pinned_message(news["PinnedMessage"])
-
+            self.add_pinned_message(news["PinnedMessage"])
             self.addNews(news["NewsArticles"])
             self.addLinks(news["Links"])
 
@@ -330,6 +320,18 @@ class CustomNewsFeed:
                     self.dockwidget.pinned_message.setStyleSheet("background:rgb(255, 85, 0);padding:8px;")
                 else:
                     self.dockwidget.pinned_message.setStyleSheet("background:rgb(173,216,230);padding:8px;")
+
+    def add_pinned_message(self, pinnedMessageJson):
+        self.current_pinned_message = pinnedMessageJson
+        pinnedmessage = json.dumps(self.current_pinned_message)
+
+        if 'StartPublishingDate' in json.loads(pinnedmessage) and 'EndPublishingDate' in json.loads(pinnedmessage):
+            if self.checkPublishingDate(self.current_pinned_message['StartPublishingDate'],self.current_pinned_message['EndPublishingDate']) == True:
+                self.configure_pinned_message(self.current_pinned_message)
+            else:
+                self.dockwidget.pinned_message.setVisible(False)
+        else:
+            self.configure_pinned_message(self.current_pinned_message)
 
 
     def addLinks(self, links):
