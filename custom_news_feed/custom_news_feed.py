@@ -518,10 +518,10 @@ class CustomNewsFeed:
                 self.dockwidget.vbox.addStretch(1)
 
                 self.dockwidget.widget.setLayout(self.dockwidget.vbox)
-                self.dockwidget.newsScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-                self.dockwidget.newsScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-                self.dockwidget.newsScrollArea.setWidgetResizable(True)
-                self.dockwidget.newsScrollArea.setWidget(self.dockwidget.widget)
+                self.dockwidget.unreadNewsScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                self.dockwidget.unreadNewsScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+                self.dockwidget.unreadNewsScrollArea.setWidgetResizable(True)
+                self.dockwidget.unreadNewsScrollArea.setWidget(self.dockwidget.widget)
 
             # put read and outdated messages to the repository news tab
             else:
@@ -594,13 +594,13 @@ class CustomNewsFeed:
                 self.dockwidget.vbox2.addStretch(1)
 
                 self.dockwidget.widget2.setLayout(self.dockwidget.vbox2)
-                self.dockwidget.newsScrollArea2.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-                self.dockwidget.newsScrollArea2.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-                self.dockwidget.newsScrollArea2.setWidgetResizable(True) 
-                self.dockwidget.newsScrollArea2.setWidget(self.dockwidget.widget2)  
+                self.dockwidget.newsRepositoryScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                self.dockwidget.newsRepositoryScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+                self.dockwidget.newsRepositoryScrollArea.setWidgetResizable(True) 
+                self.dockwidget.newsRepositoryScrollArea.setWidget(self.dockwidget.widget2)
 
                 # dirty hack to refresh main tab in the case it is empty
-                self.dockwidget.newsScrollArea.setWidget(self.dockwidget.widget)   
+                self.dockwidget.unreadNewsScrollArea.setWidget(self.dockwidget.widget)   
           
             self.dockwidget.tabWidget.setCurrentIndex(0)
             self.dockwidget.setFocus() 

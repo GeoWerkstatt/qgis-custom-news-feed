@@ -69,7 +69,7 @@ padding-left:8px;</string>
            <item>
             <layout class="QVBoxLayout" name="verticalLayout">
              <item>
-              <widget class="QScrollArea" name="newsScrollArea">
+              <widget class="QScrollArea" name="unreadNewsScrollArea">
                <property name="widgetResizable">
                 <bool>true</bool>
                </property>
@@ -102,7 +102,7 @@ padding-left:8px;</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
-            <widget class="QScrollArea" name="newsScrollArea2">
+            <widget class="QScrollArea" name="newsRepositoryScrollArea">
              <property name="widgetResizable">
               <bool>true</bool>
              </property>
