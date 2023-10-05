@@ -87,3 +87,11 @@ A valid entry in this file overwrites the configuration coming from the settings
 # # path to the news feed json-file. This setting wins - in the case it exists -  against the plugin setting.
 customnewsfeedpath=//share/folder/sample_news.json
 ```
+
+## Debugging
+
+1. Open the _OSGeo4W_ shell and run `pip3 install debugpy`
+2. In _QGIS > Settings > Options - System_ append the _Environment_ variables with `QGIS_PLUGIN_USE_DEBUGGER=debugpy` and `QGIS_PLUGINPATH={YourLocalPluginDirectory}`
+3. Install the QGIS plugin _Plugin Reloader_ to enable reloading the plugin without restarting QGIS
+4. Restart QGIS for the changes to take effect and open the plugin
+5. Start the debugger in VS Code with the launch configuration _Python: Remote Attach_

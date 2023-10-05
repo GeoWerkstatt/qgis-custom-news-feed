@@ -21,6 +21,8 @@
  *                                                                         *
  ***************************************************************************/
 """
+import os
+import shutil
 import os.path
 import json
 import hashlib
@@ -50,6 +52,17 @@ class CustomNewsFeed:
             application at run time.
         :type iface: QgsInterface
         """
+        
+        if os.environ.get("QGIS_DEBUGPY_HAS_LOADED") is None:
+            try:
+                import debugpy
+                debugpy.configure(python=shutil.which("python"))
+                debugpy.listen(('localhost', 5678))
+            except Exception as e:
+                print("Unable to create debugpy debugger: {}".format(e))
+            else:
+                os.environ["QGIS_DEBUGPY_HAS_LOADED"] = '1'
+
         # Save reference to the QGIS interface
         self.iface = iface
         self.settings = QgsSettings()
