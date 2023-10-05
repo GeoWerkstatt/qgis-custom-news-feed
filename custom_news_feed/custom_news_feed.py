@@ -265,17 +265,8 @@ class CustomNewsFeed:
 
     def display_news_content(self, news_json_file_path):
         """Display content of JSON-file in plugin."""
-        json_tree = self.get_text_content_from_path(news_json_file_path)
         try:
-            news = json.loads(json_tree)
-        except Exception as e:
-            print(str(e))
-            self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
-                    self.tr(u'JSON-file konnte nicht geladen werden. ') +
-                    self.tr(u'Mehr Informationen im QGis message log.'),
-                    level = Qgis.Critical)
-            QgsMessageLog.logMessage(u'Error Initializing Config file ' + str(e),'Custom News Feed')
-        try:
+            news = self.load_json_from_file(self, news_json_file_path)
             self.readbuttonlabel = news['ReadButtonLabel']
             self.readallbuttonlabel = news["ReadAllButtonLabel"]
             self.timer.start(news['NewsRefreshInterval'] * 60000 ) # convert minutes in miliseconds
@@ -643,7 +634,7 @@ class CustomNewsFeed:
         self.settings_dlg.config_json_path.setText(path)
 
 
-    def get_text_content_from_path(self, path):
+    def load_json_from_file(self, path):
         """Gets the text content from a path. May be a local path, or an url"""
         txt = None
         QApplication.setOverrideCursor(Qt.WaitCursor)
@@ -677,4 +668,14 @@ class CustomNewsFeed:
                 txt = f.read()
         finally:
                 QApplication.restoreOverrideCursor()
-        return txt
+
+        try:
+            json_content = json.loads(txt)
+        except Exception as e:
+            print(str(e))
+            self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
+                    self.tr(u'JSON-file konnte nicht geladen werden. ') +
+                    self.tr(u'Mehr Informationen im QGis message log.'),
+                    level = Qgis.Critical)
+            QgsMessageLog.logMessage(u'Error Initializing Config file ' + str(e),'Custom News Feed')
+        return json_content
