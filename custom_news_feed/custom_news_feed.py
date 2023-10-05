@@ -94,6 +94,7 @@ class CustomNewsFeed:
         self.toolbar = self.iface.addToolBar(u'CustomNewsFeed')
         self.toolbar.setObjectName(u'CustomNewsFeed')
         self.settingspath = abspath(join(QgsApplication.qgisSettingsDirPath(), 'customnewsfeed'))
+        self.previous_news_path = os.path.join(self.settingspath,'previous_news.json')
 
         #print "** INITIALIZING CustomNewsFeed"
         self.dockwidget = None
@@ -280,6 +281,7 @@ class CustomNewsFeed:
             self.add_pinned_message(news["PinnedMessage"])
             self.addNews(news["NewsArticles"])
             self.addLinks(news["Links"])
+            self.store_current_news(news_json_file_path)
 
         except Exception as e:
             self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
@@ -422,7 +424,18 @@ class CustomNewsFeed:
 
         widgetcount=0
 
+        if os.path.exists(self.previous_news_path):
+            previousNewsJson = self.load_json_from_file(self.previous_news_path)
+            previousNewsArcticles = previousNewsJson["NewsArticles"]
+            hasNewArticles = False
+        else:
+            previousNewsArcticles = []
+            hasNewArticles = True
+
         for index, newsArticle in enumerate(newsArticles):
+            if hasNewArticles is False and newsArticle not in previousNewsArcticles:
+                hasNewArticles = True
+
             startdate, enddate = self.getStartEndDate(newsArticle)
 
             hbox = QHBoxLayout()
@@ -600,7 +613,8 @@ class CustomNewsFeed:
             self.iface.messageBar().pushMessage("Warning", "Aktuell existieren keine ungelesenen Nachrichten", level=Qgis.Info)
         elif (widgetcount == 0 and not self.check_hashfile(self.createHash(self.current_pinned_message["Text"]))):
             self.dockwidget.close()
-        else:
+
+        if (hasNewArticles):
             self.iface.messageBar().pushMessage("Info", "Es liegen neue Nachrichten vor!", level=Qgis.Info)
             if self.forceShowGui is False:
                 self.forceShowGui = self.settings_dlg.openPanelOnNewsCheckBox.checkState() == Qt.Checked
@@ -681,3 +695,9 @@ class CustomNewsFeed:
                     level = Qgis.Critical)
             QgsMessageLog.logMessage(u'Error Initializing Config file ' + str(e),'Custom News Feed')
         return json_content
+
+    def store_current_news(self, news_json_file_path):
+        """Stores the current json file in the settings"""
+        if not QDir(self.settingspath).exists(): 
+            QDir().mkdir(self.settingspath)
+        shutil.copyfile(news_json_file_path, self.previous_news_path)
