@@ -94,6 +94,7 @@ class CustomNewsFeed:
         self.toolbar = self.iface.addToolBar(u'CustomNewsFeed')
         self.toolbar.setObjectName(u'CustomNewsFeed')
         self.settingspath = abspath(join(QgsApplication.qgisSettingsDirPath(), 'customnewsfeed'))
+        self.previous_news_path = os.path.join(self.settingspath,'previous_news.json')
 
         #print "** INITIALIZING CustomNewsFeed"
         self.dockwidget = None
@@ -265,17 +266,8 @@ class CustomNewsFeed:
 
     def display_news_content(self, news_json_file_path):
         """Display content of JSON-file in plugin."""
-        json_tree = self.get_text_content_from_path(news_json_file_path)
         try:
-            news = json.loads(json_tree)
-        except Exception as e:
-            print(str(e))
-            self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
-                    self.tr(u'JSON-file konnte nicht geladen werden. ') +
-                    self.tr(u'Mehr Informationen im QGis message log.'),
-                    level = Qgis.Critical)
-            QgsMessageLog.logMessage(u'Error Initializing Config file ' + str(e),'Custom News Feed')
-        try:
+            news = self.load_json_from_file(news_json_file_path)
             self.readbuttonlabel = news['ReadButtonLabel']
             self.readallbuttonlabel = news["ReadAllButtonLabel"]
             self.timer.start(news['NewsRefreshInterval'] * 60000 ) # convert minutes in miliseconds
@@ -286,19 +278,10 @@ class CustomNewsFeed:
             self.settings_dlg.pathToConfigurationFileLabel.setText(news["PathToConfigurationFileLabel"])
             self.settings_dlg.openPanelOnNewsCheckBox.setText(news["OpenPanelOnNewsCheckBoxLabel"])
 
-            self.current_pinned_message = news["PinnedMessage"]
-            pinnedmessage = json.dumps(news["PinnedMessage"])
-
-            if 'StartPublishingDate' in json.loads(pinnedmessage) and 'EndPublishingDate' in json.loads(pinnedmessage):
-                if self.checkPublishingDate(news["PinnedMessage"]['StartPublishingDate'],news["PinnedMessage"]['EndPublishingDate']) == True:
-                    self.configure_pinned_message(news["PinnedMessage"])
-                else:
-                    self.dockwidget.pinned_message.setVisible(False)
-            else:
-                self.configure_pinned_message(news["PinnedMessage"])
-
+            self.add_pinned_message(news["PinnedMessage"])
             self.addNews(news["NewsArticles"])
             self.addLinks(news["Links"])
+            self.store_current_news(news_json_file_path)
 
         except Exception as e:
             self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
@@ -339,6 +322,18 @@ class CustomNewsFeed:
                     self.dockwidget.pinned_message.setStyleSheet("background:rgb(255, 85, 0);padding:8px;")
                 else:
                     self.dockwidget.pinned_message.setStyleSheet("background:rgb(173,216,230);padding:8px;")
+
+    def add_pinned_message(self, pinnedMessageJson):
+        self.current_pinned_message = pinnedMessageJson
+        pinnedmessage = json.dumps(self.current_pinned_message)
+
+        if 'StartPublishingDate' in json.loads(pinnedmessage) and 'EndPublishingDate' in json.loads(pinnedmessage):
+            if self.checkPublishingDate(self.current_pinned_message['StartPublishingDate'],self.current_pinned_message['EndPublishingDate']) == True:
+                self.configure_pinned_message(self.current_pinned_message)
+            else:
+                self.dockwidget.pinned_message.setVisible(False)
+        else:
+            self.configure_pinned_message(self.current_pinned_message)
 
 
     def addLinks(self, links):
@@ -403,11 +398,13 @@ class CustomNewsFeed:
 
     def mark_all_as_read(self, newsArticles):
         """Mark all news as read"""
+        QApplication.setOverrideCursor(Qt.WaitCursor)
         for index, newsArticle in enumerate(newsArticles):
             startdate, enddate = self.getStartEndDate(newsArticle)
             if self.check_hashfile(newsArticle["Hash"]) == False and self.checkPublishingDate(startdate, enddate) == True:
                 self.create_hashfile(newsArticle["Hash"], True)
         self.get_news()
+        QApplication.restoreOverrideCursor()
 		
     def getStartEndDate(self, newsArticle):
         """Check the existence of a publishing date range"""
@@ -429,7 +426,17 @@ class CustomNewsFeed:
 
         widgetcount=0
 
+        if os.path.exists(self.previous_news_path):
+            previousNewsJson = self.load_json_from_file(self.previous_news_path)
+            previousNewsArcticles = previousNewsJson["NewsArticles"]
+            hasNewArticles = False
+        else:
+            hasNewArticles = True
+
         for index, newsArticle in enumerate(newsArticles):
+            if hasNewArticles is False and newsArticle not in previousNewsArcticles:
+                hasNewArticles = True
+
             startdate, enddate = self.getStartEndDate(newsArticle)
 
             hbox = QHBoxLayout()
@@ -607,7 +614,8 @@ class CustomNewsFeed:
             self.iface.messageBar().pushMessage("Warning", "Aktuell existieren keine ungelesenen Nachrichten", level=Qgis.Info)
         elif (widgetcount == 0 and not self.check_hashfile(self.createHash(self.current_pinned_message["Text"]))):
             self.dockwidget.close()
-        else:
+
+        if (hasNewArticles):
             self.iface.messageBar().pushMessage("Info", "Es liegen neue Nachrichten vor!", level=Qgis.Info)
             if self.forceShowGui is False:
                 self.forceShowGui = self.settings_dlg.openPanelOnNewsCheckBox.checkState() == Qt.Checked
@@ -643,7 +651,7 @@ class CustomNewsFeed:
         self.settings_dlg.config_json_path.setText(path)
 
 
-    def get_text_content_from_path(self, path):
+    def load_json_from_file(self, path):
         """Gets the text content from a path. May be a local path, or an url"""
         txt = None
         QApplication.setOverrideCursor(Qt.WaitCursor)
@@ -670,11 +678,27 @@ class CustomNewsFeed:
             self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
                 self.tr(u'Die Datei ') + path +
                 self.tr(u' konnte nicht gelesen werden. ') +
-                self.tr(u'Mehr Informationen im QGis message log. Beispielhafe News werden angezeigt.'),
+                self.tr(u'Mehr Informationen im QGis message log. Beispielhafte News werden angezeigt.'),
                 level = Qgis.Critical)
             QgsMessageLog.logMessage(u'Error reading file ' + str(e),'Custom News Feed')
             with open(os.path.join(self.plugin_dir, 'sample_news','sample_news.json'),'r', encoding='utf-8') as f:
                 txt = f.read()
         finally:
                 QApplication.restoreOverrideCursor()
-        return txt
+
+        try:
+            json_content = json.loads(txt)
+        except Exception as e:
+            print(str(e))
+            self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
+                    self.tr(u'JSON-file konnte nicht geladen werden. ') +
+                    self.tr(u'Mehr Informationen im QGis message log.'),
+                    level = Qgis.Critical)
+            QgsMessageLog.logMessage(u'Error Initializing Config file ' + str(e),'Custom News Feed')
+        return json_content
+
+    def store_current_news(self, news_json_file_path):
+        """Stores the current json file in the settings"""
+        if not QDir(self.settingspath).exists(): 
+            QDir().mkdir(self.settingspath)
+        shutil.copyfile(news_json_file_path, self.previous_news_path)
