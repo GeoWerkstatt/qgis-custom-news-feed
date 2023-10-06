@@ -327,23 +327,23 @@ class CustomNewsFeed:
 
     def addLinks(self, links):
         """ Add links to the link section of the plugin."""
-        # Only display section if links are available
-        self.dockwidget.linksScrollArea.setVisible(len(links) > 0)
-        self.dockwidget.linkSectionLabel.setVisible(len(links) > 0)
-        self.dockwidget.widget = QWidget()
-        self.dockwidget.vbox = QVBoxLayout()
+        hasLinks = len(links) > 0
+        self.dockwidget.linksScrollArea.setVisible(hasLinks)
+        self.dockwidget.linkSectionLabel.setVisible(hasLinks)
 
-        for link in links:
-            label= QLabel("<a href=% s>% s</a>" % (link['Url'], link['LinkTitle']))
-            label.setTextFormat(Qt.RichText)
-            label.setOpenExternalLinks(True)
-            self.dockwidget.vbox.addWidget(label)
+        if hasLinks:
+            widget = QWidget()
+            vbox = QVBoxLayout()
+            widget.setLayout(vbox)
+            self.dockwidget.linksScrollArea.setWidget(widget)
 
-        self.dockwidget.widget.setLayout(self.dockwidget.vbox)
-        self.dockwidget.linksScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.dockwidget.linksScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.dockwidget.linksScrollArea.setWidgetResizable(True)
-        self.dockwidget.linksScrollArea.setWidget(self.dockwidget.widget)
+            for link in links:
+                label= QLabel("<a href=% s>% s</a>" % (link['Url'], link['LinkTitle']))
+                label.setTextFormat(Qt.RichText)
+                label.setOpenExternalLinks(True)
+                vbox.addWidget(label)
+                
+            vbox.addStretch(1)
 
     def checkPublishingDate(self, startdate, enddate):
         """ Checks the date relevance of a news entry by its date range """
