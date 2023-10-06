@@ -70,19 +70,15 @@ padding-left:8px;</string>
             <layout class="QVBoxLayout" name="verticalLayout">
              <item>
               <widget class="QScrollArea" name="unreadNewsScrollArea">
+               <property name="verticalScrollBarPolicy">
+                <enum>Qt::ScrollBarAsNeeded</enum>
+               </property>
+               <property name="horizontalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOff</enum>
+               </property>
                <property name="widgetResizable">
                 <bool>true</bool>
                </property>
-               <widget class="QWidget" name="scrollAreaWidgetContents_2">
-                <property name="geometry">
-                 <rect>
-                  <x>0</x>
-                  <y>0</y>
-                  <width>503</width>
-                  <height>581</height>
-                 </rect>
-                </property>
-               </widget>
               </widget>
              </item>
              <item>
@@ -103,20 +99,15 @@ padding-left:8px;</string>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
             <widget class="QScrollArea" name="newsRepositoryScrollArea">
+             <property name="verticalScrollBarPolicy">
+              <enum>Qt::ScrollBarAsNeeded</enum>
+             </property>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
              <property name="widgetResizable">
               <bool>true</bool>
              </property>
-             <widget class="QWidget" name="scrollAreaWidgetContents_3">
-              <property name="geometry">
-               <rect>
-                <x>0</x>
-                <y>0</y>
-                <width>505</width>
-                <height>612</height>
-               </rect>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_5"/>
-             </widget>
             </widget>
            </item>
           </layout>
