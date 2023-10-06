@@ -443,6 +443,9 @@ class CustomNewsFeed:
             else:
                 newsRepositoryBox.addWidget(articleBox)
         
+        unreadNewsBox.addStretch(1)
+        newsRepositoryBox.addStretch(1)
+        
         self.dockwidget.readAllButton.setText(self.readallbuttonlabel)
         self.dockwidget.readAllButton.clicked.connect(partial(self.mark_all_as_read, newsArticles))
         self.dockwidget.readAllButton.setDisabled(hasUnreadNews == False)
@@ -592,8 +595,6 @@ class CustomNewsFeed:
             readbutton.adjustSize()
             textBox.addWidget(readbutton)
 
-        textBox.addStretch(1)
-
         if not newsArticle["ImageUrl"] == "":
             imageBox = QVBoxLayout()
             image = QImage()
@@ -628,9 +629,7 @@ class CustomNewsFeed:
                 image_label.setPixmap(QPixmap(image).scaledToWidth(150, Qt.SmoothTransformation))
                 imageBox.setContentsMargins(10,15,0,0)
                 imageBox.addWidget(image_label)
-                imageBox.addStretch(1)
                 articleBox.addLayout(imageBox)
         
-        spacer = QSpacerItem(0, 15)
-        articleBox.addItem(spacer)
+        articleBox.setContentsMargins(0,0,0,10)
         return articleWidget, isUnread
