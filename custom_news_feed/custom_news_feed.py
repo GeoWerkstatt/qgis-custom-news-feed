@@ -359,7 +359,6 @@ class CustomNewsFeed:
 
     def checkPublishingDate(self, startdate, enddate):
         """ Checks the date relevance of a news entry by its date range """
-        ret = True
         now = datetime.now().isoformat()
 
         if startdate and enddate:
