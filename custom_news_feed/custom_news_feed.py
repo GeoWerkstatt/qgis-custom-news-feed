@@ -270,6 +270,7 @@ class CustomNewsFeed:
             self.settings_dlg.pathToConfigurationFileLabel.setText(news["PathToConfigurationFileLabel"])
             self.settings_dlg.openPanelOnNewsCheckBox.setText(news["OpenPanelOnNewsCheckBoxLabel"])
 
+            self.remove_deprecated_hashfiles(news["NewsArticles"])
             self.add_pinned_message(news["PinnedMessage"])
             self.addNews(news["NewsArticles"])
             self.addLinks(news["Links"])
@@ -347,7 +348,6 @@ class CustomNewsFeed:
 
     def checkPublishingDate(self, startdate, enddate):
         """ Checks the date relevance of a news entry by its date range """
-        ret = True
         now = datetime.now().isoformat()
 
         if startdate and enddate:
@@ -370,8 +370,9 @@ class CustomNewsFeed:
     def delete_hashfile(self, newsidenty):
         """ Deletes a hash file related to the news entry """
         filename = abspath(join(self.settingspath, newsidenty))
-        os.remove(filename)
-        self.get_news()
+        if os.path.exists(filename):
+            os.remove(filename)
+            self.get_news()
 
     def create_hashfile(self, newsident, noReload=False):
         """ Creates a hash file related to the news entry """
@@ -532,6 +533,15 @@ class CustomNewsFeed:
         if not QDir(self.settingspath).exists(): 
             QDir().mkdir(self.settingspath)
         shutil.copyfile(news_json_file_path, self.previous_news_path)
+
+    def remove_deprecated_hashfiles(self, newsArticles):
+        if os.path.exists(self.previous_news_path):
+            previousNewsJson = self.load_json_from_file(self.previous_news_path)
+            previousNewsArcticles = previousNewsJson["NewsArticles"]
+
+            for previousArticle in previousNewsArcticles:
+                if previousArticle not in newsArticles:
+                    self.delete_hashfile(self.createHash(previousArticle["Title"]+previousArticle["Date"]))
 
     def create_tab_widget(self, tab):
         """ Creates a layout for the news articles and adds it to the tab """
