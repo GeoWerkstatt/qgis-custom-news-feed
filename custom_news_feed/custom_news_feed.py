@@ -115,7 +115,6 @@ class CustomNewsFeed:
         """
         return QCoreApplication.translate('CustomNewsFeed', message)
 
-
     def add_action(
         self,
         icon_path,
@@ -217,12 +216,9 @@ class CustomNewsFeed:
             status_tip=self.tr(u'Custom News Feed Settings'),
             parent=self.iface.mainWindow())
 
-    #--------------------------------------------------------------------------
-
     def onClosePlugin(self):
         """Cleanup necessary items here when plugin dockwidget is closed"""
         self.dockwidget.closingPlugin.disconnect(self.onClosePlugin)
-
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -235,8 +231,6 @@ class CustomNewsFeed:
             self.iface.removeToolBarIcon(action)
         # Remove the toolbar
         del self.toolbar
-
-    #--------------------------------------------------------------------------
 
     def run(self):
         """Run method that loads and starts the plugin"""
@@ -252,7 +246,6 @@ class CustomNewsFeed:
 
         self.get_news()
 
-
     def get_news(self):
         """Get news content from JSON-file and display it."""
         if self.settings.contains('/pythonplugins/customnewsfeedpath'):
@@ -262,7 +255,6 @@ class CustomNewsFeed:
         if not news_json_file_path:
             news_json_file_path = os.path.join(self.plugin_dir, 'sample_news','sample_news.json')
         self.display_news_content(news_json_file_path)
-
 
     def display_news_content(self, news_json_file_path):
         """Display content of JSON-file in plugin."""
@@ -289,7 +281,6 @@ class CustomNewsFeed:
                     level = Qgis.Critical)
             QgsMessageLog.logMessage(u'Error Reading Config file, missing field ' + str(e),'Custom News Feed')
 
-
     def toggle_message_hashfile(self, event):
         """Toggles pinned messages resized/full-sized state"""
         hash = self.createHash(self.current_pinned_message["Text"])
@@ -298,7 +289,6 @@ class CustomNewsFeed:
         else:                      
             self.create_hashfile(hash)
         self.reloadNews
-
 
     def configure_pinned_message(self, pinnedMessageJson):
         """Adds pinned message to plugin in three possible styles."""
@@ -335,7 +325,6 @@ class CustomNewsFeed:
         else:
             self.configure_pinned_message(self.current_pinned_message)
 
-
     def addLinks(self, links):
         """ Add links to the link section of the plugin."""
         # Only display section if links are available
@@ -369,7 +358,6 @@ class CustomNewsFeed:
             return now <= enddate
 
         return True
-
 
     def check_hashfile(self, newsidenty) -> bool:
         """ Checks the existence of a hash file related to the news entry """
@@ -492,7 +480,6 @@ class CustomNewsFeed:
                     directory = self.plugin_dir,
                     filter = '*.json')[0]
         self.settings_dlg.config_json_path.setText(path)
-
 
     def load_json_from_file(self, path):
         """Gets the text content from a path. May be a local path, or an url"""
