@@ -86,6 +86,7 @@ A valid entry in this file overwrites the configuration coming from the settings
 [pythonplugins]
 # # path to the news feed json-file. This setting wins - in the case it exists -  against the plugin setting.
 customnewsfeedpath=//share/folder/sample_news.json
+open_on_news=1|2   (possible values: 0: don't open panel if there are new news/ 2: open panel if there are new news)
 ```
 
 ## Debugging
