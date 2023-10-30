@@ -279,7 +279,7 @@ class CustomNewsFeed:
             self.add_pinned_message()
             self.addNews()
             self.addLinks()
-            self.store_current_news(news_json_file_path)
+            self.store_current_news()
             self.show_panel()
 
         except Exception as e:
@@ -531,11 +531,20 @@ class CustomNewsFeed:
             QgsMessageLog.logMessage(u'Error Initializing Config file ' + str(e),'Custom News Feed')
         return json_content
 
-    def store_current_news(self, news_json_file_path):
+    def store_current_news(self):
         """Stores the current json file in the settings"""
-        if not QDir(self.settingspath).exists(): 
-            QDir().mkdir(self.settingspath)
-        shutil.copyfile(news_json_file_path, self.previous_news_path)
+        try:
+            if not QDir(self.settingspath).exists(): 
+                QDir().mkdir(self.settingspath)
+            
+            with open(self.previous_news_path, 'w') as outfile:
+                json.dump(self.news, outfile)
+        except Exception as e:
+            self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
+                    self.tr(u'News konnten nicht gespeichert werden. ') +
+                    self.tr(u'Mehr Informationen im QGis message log.'),
+                    level = Qgis.Critical)
+            QgsMessageLog.logMessage(u'Error writing previous_news file: ' + str(e),'Custom News Feed')
 
     def create_tab_widget(self, tab):
         """ Creates a layout for the news articles and adds it to the tab """
