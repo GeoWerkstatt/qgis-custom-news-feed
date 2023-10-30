@@ -262,8 +262,6 @@ class CustomNewsFeed:
         """Display content of JSON-file in plugin."""
         try:
             self.news = self.load_json_from_file(news_json_file_path)
-            self.readbuttonlabel = news['ReadButtonLabel']
-            self.readallbuttonlabel = news["ReadAllButtonLabel"]
             self.timer.start(self.news['NewsRefreshInterval'] * 60000 ) # convert minutes in miliseconds
             self.dockwidget.setWindowTitle(self.news['PanelTitle'])
             self.dockwidget.tabWidget.setTabText(0, self.news['PanelTitleFeed'])
@@ -439,7 +437,7 @@ class CustomNewsFeed:
         unreadNewsBox.addStretch(1)
         newsRepositoryBox.addStretch(1)
         
-        self.dockwidget.readAllButton.setText(self.readallbuttonlabel)
+        self.dockwidget.readAllButton.setText(self.news["ReadAllButtonLabel"])
         self.dockwidget.readAllButton.clicked.connect(partial(self.mark_all_as_read, newsArticles))
         self.dockwidget.readAllButton.setDisabled(hasUnreadNews == False)
 
@@ -582,7 +580,7 @@ class CustomNewsFeed:
         if isUnread:
             spacer = QSpacerItem(0, 5)
             textBox.addItem(spacer)
-            readbutton = QPushButton(self.readbuttonlabel)
+            readbutton = QPushButton(self.news['ReadButtonLabel'])
             readbutton.clicked.connect(partial(self.create_hashfile, newsArticle['Hash']))
             readbutton.adjustSize()
             textBox.addWidget(readbutton)
