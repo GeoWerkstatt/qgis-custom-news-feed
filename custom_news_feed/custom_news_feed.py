@@ -394,12 +394,18 @@ class CustomNewsFeed:
         self.get_news()
         QApplication.restoreOverrideCursor()
 		
-    def getStartEndDate(self, newsArticle):
+    def getStartEndDate(self, jsonObject):
         """Check the existence of a publishing date range"""
-        startdate = enddate = None
-        if 'StartPublishingDate' in json.loads(json.dumps(newsArticle)): startdate = newsArticle['StartPublishingDate'] 
-        if 'EndPublishingDate' in json.loads(json.dumps(newsArticle)): enddate = newsArticle['EndPublishingDate']
+        startdate = self.get_json_field("StartPublishingDate",jsonObject)
+        enddate = self.get_json_field("EndPublishingDate",jsonObject)
         return startdate, enddate
+    
+    def get_json_field(self, fieldName, jsonObject):
+        """Check the existence of a json field"""
+        if jsonObject is None or fieldName not in json.loads(json.dumps(jsonObject)):
+            return None
+        else:
+            return jsonObject[fieldName]
 
     def reloadNews(self):
         self.forceShowGui = False
