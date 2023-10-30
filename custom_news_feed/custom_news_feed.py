@@ -420,6 +420,7 @@ class CustomNewsFeed:
 
         newsArticles = self.get_json_field("NewsArticles",self.news)
         previousNewsArcticles = self.get_json_field("NewsArticles",self.previousNews)
+        hasUnreadNews = False
 
         for newsArticle in newsArticles:
             if self.hasNewArticles is False and previousNewsArcticles is not None and newsArticle not in previousNewsArcticles:
