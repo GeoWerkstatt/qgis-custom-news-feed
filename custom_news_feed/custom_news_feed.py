@@ -277,6 +277,7 @@ class CustomNewsFeed:
                 self.hasNewArticles = True
             
             self.add_pinned_message()
+            self.remove_deprecated_hashfiles()
             self.addNews()
             self.addLinks()
             self.store_current_news()
@@ -349,7 +350,6 @@ class CustomNewsFeed:
 
     def checkPublishingDate(self, startdate, enddate):
         """ Checks the date relevance of a news entry by its date range """
-        ret = True
         now = datetime.now().isoformat()
 
         if startdate and enddate:
@@ -372,8 +372,9 @@ class CustomNewsFeed:
     def delete_hashfile(self, newsidenty):
         """ Deletes a hash file related to the news entry """
         filename = abspath(join(self.settingspath, newsidenty))
-        os.remove(filename)
-        self.get_news()
+        if os.path.exists(filename):
+            os.remove(filename)
+            self.get_news()
 
     def create_hashfile(self, newsident, noReload=False):
         """ Creates a hash file related to the news entry """
@@ -427,12 +428,13 @@ class CustomNewsFeed:
                 self.hasNewArticles = True
 
             articleBox, isUnread = self.create_article_widget(newsArticle)
-            if isUnread:
-                hasUnreadNews = True
-                unreadNewsBox.addWidget(articleBox)
+            if articleBox is not None:
+                if isUnread:
+                    hasUnreadNews = True
+                    unreadNewsBox.addWidget(articleBox)
 
-            else:
-                newsRepositoryBox.addWidget(articleBox)
+                else:
+                    newsRepositoryBox.addWidget(articleBox)
         
         unreadNewsBox.addStretch(1)
         newsRepositoryBox.addStretch(1)
@@ -546,6 +548,15 @@ class CustomNewsFeed:
                     level = Qgis.Critical)
             QgsMessageLog.logMessage(u'Error writing previous_news file: ' + str(e),'Custom News Feed')
 
+    def remove_deprecated_hashfiles(self):
+        """Removes hash files that are not in the current news anymore"""
+        previousNewsArticles = self.get_json_field("NewsArticles",self.previousNews)
+        if previousNewsArticles is not None:
+            newsArticles = self.get_json_field("NewsArticles",self.news)
+            for previousNewsArticle in previousNewsArticles:
+                if previousNewsArticle not in newsArticles:
+                    self.delete_hashfile(self.createHash(previousNewsArticle["Title"]+previousNewsArticle["Date"]))
+
     def create_tab_widget(self, tab):
         """ Creates a layout for the news articles and adds it to the tab """
         widget = QWidget()
@@ -557,79 +568,83 @@ class CustomNewsFeed:
 
     def create_article_widget(self, newsArticle):
         """ Creates a widget for a news article """
-        articleWidget = QWidget()
-        articleBox = QHBoxLayout()
-        articleBox.setContentsMargins(0,0,0,0)
-        articleBox.setSpacing(0)
-        articleWidget.setLayout(articleBox)
-
-        textBox = QVBoxLayout()
-        articleBox.addLayout(textBox)
-        
-        title = QLabel(newsArticle['Title'])
-        title.setStyleSheet("font-weight: bold")
-        textBox.addWidget(title)
-
-        date = QLabel(newsArticle['Date'])
-        date.setStyleSheet("color: grey")
-        textBox.addWidget(date)
-
-        text= QLabel(newsArticle['Text'])
-        text.setWordWrap(True)
-        textBox.addWidget(text)
-        
-        if not newsArticle['LinkTitle'] == "":
-            link = QLabel("<a href=% s>% s</a>" % (newsArticle['LinkUrl'], newsArticle['LinkTitle']))
-            link.setTextFormat(Qt.RichText)
-            link.setOpenExternalLinks(True)
-            textBox.addWidget(link)
-
-        newsArticle['Hash'] = self.createHash(str(newsArticle['Title']+newsArticle['Date']))
         startdate, enddate = self.getStartEndDate(newsArticle)
-        isUnread = self.check_hashfile(newsArticle['Hash']) == False and self.checkPublishingDate(startdate, enddate) == True
-        if isUnread:
-            spacer = QSpacerItem(0, 5)
-            textBox.addItem(spacer)
-            readbutton = QPushButton(self.news['ReadButtonLabel'])
-            readbutton.clicked.connect(partial(self.create_hashfile, newsArticle['Hash']))
-            readbutton.adjustSize()
-            textBox.addWidget(readbutton)
+        if self.checkPublishingDate(startdate, enddate) == True:
+            articleWidget = QWidget()
+            articleBox = QHBoxLayout()
+            articleBox.setContentsMargins(0,0,0,0)
+            articleBox.setSpacing(0)
+            articleWidget.setLayout(articleBox)
 
-        if not newsArticle["ImageUrl"] == "":
-            imageBox = QVBoxLayout()
-            image = QImage()
-            imageUrl = newsArticle["ImageUrl"]
-            try:
-                if imageUrl[0:4].lower() == 'http':
-                    request = QNetworkRequest(QUrl(imageUrl))
-                    blockingRequest = QgsBlockingNetworkRequest()
-                    result = blockingRequest.get(request)
-                    if result == QgsBlockingNetworkRequest.NoError:
-                        reply = blockingRequest.reply()
-                        if reply.error() == QNetworkReply.NoError:
-                            image.loadFromData(reply.content())
+            textBox = QVBoxLayout()
+            articleBox.addLayout(textBox)
+            
+            title = QLabel(newsArticle['Title'])
+            title.setStyleSheet("font-weight: bold")
+            textBox.addWidget(title)
+
+            date = QLabel(newsArticle['Date'])
+            date.setStyleSheet("color: grey")
+            textBox.addWidget(date)
+
+            text= QLabel(newsArticle['Text'])
+            text.setWordWrap(True)
+            textBox.addWidget(text)
+            
+            if not newsArticle['LinkTitle'] == "":
+                link = QLabel("<a href=% s>% s</a>" % (newsArticle['LinkUrl'], newsArticle['LinkTitle']))
+                link.setTextFormat(Qt.RichText)
+                link.setOpenExternalLinks(True)
+                textBox.addWidget(link)
+
+            newsArticle['Hash'] = self.createHash(str(newsArticle['Title']+newsArticle['Date']))
+        
+            isUnread = self.check_hashfile(newsArticle['Hash']) == False
+            if isUnread:
+                spacer = QSpacerItem(0, 5)
+                textBox.addItem(spacer)
+                readbutton = QPushButton(self.news['ReadButtonLabel'])
+                readbutton.clicked.connect(partial(self.create_hashfile, newsArticle['Hash']))
+                readbutton.adjustSize()
+                textBox.addWidget(readbutton)
+
+            if not newsArticle["ImageUrl"] == "":
+                imageBox = QVBoxLayout()
+                image = QImage()
+                imageUrl = newsArticle["ImageUrl"]
+                try:
+                    if imageUrl[0:4].lower() == 'http':
+                        request = QNetworkRequest(QUrl(imageUrl))
+                        blockingRequest = QgsBlockingNetworkRequest()
+                        result = blockingRequest.get(request)
+                        if result == QgsBlockingNetworkRequest.NoError:
+                            reply = blockingRequest.reply()
+                            if reply.error() == QNetworkReply.NoError:
+                                image.loadFromData(reply.content())
+                            else:
+                                image = None
+                                QgsMessageLog.logMessage(u'Error reading image ' + reply.errorString(),'Custom News Feed')
                         else:
                             image = None
-                            QgsMessageLog.logMessage(u'Error reading image ' + reply.errorString(),'Custom News Feed')
-                    else:
-                        image = None
-                        QgsMessageLog.logMessage(u'Error reading image ' + blockingRequest.errorMessage(),'Custom News Feed')
-                else :
-                    with open(imageUrl, 'rb') as file:
-                        image.loadFromData(file.read())
-            except Exception as e:                                    
-                self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
-                    self.tr(u'Das Bild mit der Url ') + imageUrl +
-                    self.tr(u' konnte nicht geladen werden. '),
-                    level = Qgis.Critical)
-                QgsMessageLog.logMessage(u'Error reading image ' + str(e),'Custom News Feed')
-            if image is not None:
-                image_label = QLabel()
-                image_label.setFixedWidth(150)
-                image_label.setPixmap(QPixmap(image).scaledToWidth(150, Qt.SmoothTransformation))
-                imageBox.setContentsMargins(10,15,0,0)
-                imageBox.addWidget(image_label)
-                articleBox.addLayout(imageBox)
-        
-        articleBox.setContentsMargins(0,0,0,10)
-        return articleWidget, isUnread
+                            QgsMessageLog.logMessage(u'Error reading image ' + blockingRequest.errorMessage(),'Custom News Feed')
+                    else :
+                        with open(imageUrl, 'rb') as file:
+                            image.loadFromData(file.read())
+                except Exception as e:                                    
+                    self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
+                        self.tr(u'Das Bild mit der Url ') + imageUrl +
+                        self.tr(u' konnte nicht geladen werden. '),
+                        level = Qgis.Critical)
+                    QgsMessageLog.logMessage(u'Error reading image ' + str(e),'Custom News Feed')
+                if image is not None:
+                    image_label = QLabel()
+                    image_label.setFixedWidth(150)
+                    image_label.setPixmap(QPixmap(image).scaledToWidth(150, Qt.SmoothTransformation))
+                    imageBox.setContentsMargins(10,15,0,0)
+                    imageBox.addWidget(image_label)
+                    articleBox.addLayout(imageBox)
+            
+            articleBox.setContentsMargins(0,0,0,10)
+            return articleWidget, isUnread
+        else:
+            return None, False
