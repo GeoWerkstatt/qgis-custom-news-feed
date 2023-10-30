@@ -280,6 +280,7 @@ class CustomNewsFeed:
             self.addNews()
             self.addLinks()
             self.store_current_news(news_json_file_path)
+            self.show_panel()
 
         except Exception as e:
             self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
@@ -449,7 +450,8 @@ class CustomNewsFeed:
             if self.check_hashfile(self.createHash(self.current_pinned_message["Text"])):
                 self.iface.messageBar().pushMessage("Warning", "Aktuell existieren keine ungelesenen Nachrichten", level=Qgis.Info)
 
-        if hasNewArticles:
+    def show_panel(self):
+        if self.hasNewArticles:
             self.iface.messageBar().pushMessage("Info", "Es liegen neue Nachrichten vor!", level=Qgis.Info)
             if self.forceShowGui is False:
                 self.forceShowGui = self.settings_dlg.openPanelOnNewsCheckBox.checkState() == Qt.Checked
