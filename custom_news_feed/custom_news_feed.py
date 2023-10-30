@@ -95,14 +95,16 @@ class CustomNewsFeed:
         self.toolbar.setObjectName(u'CustomNewsFeed')
         self.settingspath = abspath(join(QgsApplication.qgisSettingsDirPath(), 'customnewsfeed'))
         self.previous_news_path = os.path.join(self.settingspath,'previous_news.json')
+        self.news = None
+        self.previousNews = None
+        self.hasNewArticles = False
+        self.current_pinned_message = ''
 
         #print "** INITIALIZING CustomNewsFeed"
         self.dockwidget = None
 
         # Signals and slots
         self.settings_dlg.browse_btn.clicked.connect(self.choose_file)
-        self.current_pinned_message = ''
-
 
         # Add update interval to update news once a day
         self.timer = QTimer()
@@ -259,20 +261,26 @@ class CustomNewsFeed:
     def display_news_content(self, news_json_file_path):
         """Display content of JSON-file in plugin."""
         try:
-            news = self.load_json_from_file(news_json_file_path)
+            self.news = self.load_json_from_file(news_json_file_path)
             self.readbuttonlabel = news['ReadButtonLabel']
             self.readallbuttonlabel = news["ReadAllButtonLabel"]
-            self.timer.start(news['NewsRefreshInterval'] * 60000 ) # convert minutes in miliseconds
-            self.dockwidget.setWindowTitle(news['PanelTitle'])
-            self.dockwidget.tabWidget.setTabText(0, news['PanelTitleFeed'])
-            self.dockwidget.tabWidget.setTabText(1, news['PanelTitleFeedRepository'])
-            self.dockwidget.linkSectionLabel.setText(news['LinkSectionTitle'])
-            self.settings_dlg.pathToConfigurationFileLabel.setText(news["PathToConfigurationFileLabel"])
-            self.settings_dlg.openPanelOnNewsCheckBox.setText(news["OpenPanelOnNewsCheckBoxLabel"])
+            self.timer.start(self.news['NewsRefreshInterval'] * 60000 ) # convert minutes in miliseconds
+            self.dockwidget.setWindowTitle(self.news['PanelTitle'])
+            self.dockwidget.tabWidget.setTabText(0, self.news['PanelTitleFeed'])
+            self.dockwidget.tabWidget.setTabText(1, self.news['PanelTitleFeedRepository'])
+            self.dockwidget.linkSectionLabel.setText(self.news['LinkSectionTitle'])
+            self.settings_dlg.pathToConfigurationFileLabel.setText(self.news["PathToConfigurationFileLabel"])
+            self.settings_dlg.openPanelOnNewsCheckBox.setText(self.news["OpenPanelOnNewsCheckBoxLabel"])
 
-            self.add_pinned_message(news["PinnedMessage"])
-            self.addNews(news["NewsArticles"])
-            self.addLinks(news["Links"])
+            if os.path.exists(self.previous_news_path):
+                self.previousNews = self.load_json_from_file(self.previous_news_path)
+                self.hasNewArticles = False
+            else:
+                self.hasNewArticles = True
+            
+            self.add_pinned_message()
+            self.addNews()
+            self.addLinks()
             self.store_current_news(news_json_file_path)
 
         except Exception as e:
@@ -313,8 +321,8 @@ class CustomNewsFeed:
                 else:
                     self.dockwidget.pinned_message.setStyleSheet("background:rgb(173,216,230);padding:8px;")
 
-    def add_pinned_message(self, pinnedMessageJson):
-        self.current_pinned_message = pinnedMessageJson
+    def add_pinned_message(self):
+        self.current_pinned_message = self.get_json_field("PinnedMessage",self.news)
         pinnedmessage = json.dumps(self.current_pinned_message)
 
         if 'StartPublishingDate' in json.loads(pinnedmessage) and 'EndPublishingDate' in json.loads(pinnedmessage):
@@ -325,9 +333,10 @@ class CustomNewsFeed:
         else:
             self.configure_pinned_message(self.current_pinned_message)
 
-    def addLinks(self, links):
+    def addLinks(self):
         """ Add links to the link section of the plugin."""
-        hasLinks = len(links) > 0
+        links = self.get_json_field("Links",self.news)
+        hasLinks = links is not None and len(links) > 0
         self.dockwidget.linksScrollArea.setVisible(hasLinks)
         self.dockwidget.linkSectionLabel.setVisible(hasLinks)
 
@@ -411,23 +420,17 @@ class CustomNewsFeed:
         self.forceShowGui = False
         self.get_news()
 
-    def addNews(self, newsArticles):
+    def addNews(self):
         """ Add new articles to the news and news repository section of the plugin."""
         unreadNewsBox = self.create_tab_widget(self.dockwidget.unreadNewsScrollArea)
         newsRepositoryBox = self.create_tab_widget(self.dockwidget.newsRepositoryScrollArea)
 
-        hasUnreadNews = False
-
-        if os.path.exists(self.previous_news_path):
-            previousNewsJson = self.load_json_from_file(self.previous_news_path)
-            previousNewsArcticles = previousNewsJson["NewsArticles"]
-            hasNewArticles = False
-        else:
-            hasNewArticles = True
+        newsArticles = self.get_json_field("NewsArticles",self.news)
+        previousNewsArcticles = self.get_json_field("NewsArticles",self.previousNews)
 
         for newsArticle in newsArticles:
-            if hasNewArticles is False and newsArticle not in previousNewsArcticles:
-                hasNewArticles = True
+            if self.hasNewArticles is False and previousNewsArcticles is not None and newsArticle not in previousNewsArcticles:
+                self.hasNewArticles = True
 
             articleBox, isUnread = self.create_article_widget(newsArticle)
             if isUnread:
