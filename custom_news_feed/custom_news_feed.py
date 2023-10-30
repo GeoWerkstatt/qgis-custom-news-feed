@@ -298,40 +298,36 @@ class CustomNewsFeed:
             self.create_hashfile(hash)
         self.reloadNews
 
-    def configure_pinned_message(self, pinnedMessageJson):
+    def add_pinned_message(self):
         """Adds pinned message to plugin in three possible styles."""
         self.dockwidget.pinned_message.setVisible(False)
-        self.dockwidget.pinned_message.mousePressEvent = self.toggle_message_hashfile
-        self.dockwidget.pinned_message.setText(str(self.current_pinned_message["Text"]))
-        if self.check_hashfile(self.createHash(pinnedMessageJson["Text"])) == True :
-            self.dockwidget.pinned_message.setText(self.dockwidget.pinned_message.text()[:60]+ '...')
-        else:
-            self.dockwidget.pinned_message.setText(str(self.current_pinned_message["Text"]))
-
-        if pinnedMessageJson["Text"] != "":
-            self.dockwidget.pinned_message.setVisible(True)
-        if pinnedMessageJson["Importance"]=="low" :
-            self.dockwidget.pinned_message.setStyleSheet("background:rgb(154, 229, 114);padding:8px;")
-        else:
-            if pinnedMessageJson["Importance"]=="medium":
-                self.dockwidget.pinned_message.setStyleSheet("background:rgb(255, 206, 58);padding:8px;")
-            else:
-                if pinnedMessageJson["Importance"]=="high":
-                    self.dockwidget.pinned_message.setStyleSheet("background:rgb(255, 85, 0);padding:8px;")
-                else:
-                    self.dockwidget.pinned_message.setStyleSheet("background:rgb(173,216,230);padding:8px;")
-
-    def add_pinned_message(self):
         self.current_pinned_message = self.get_json_field("PinnedMessage",self.news)
-        pinnedmessage = json.dumps(self.current_pinned_message)
+        if self.current_pinned_message is not None:
+            previousMessage = self.get_json_field("PinnedMessage",self.previousNews)
+            if previousMessage is None or self.current_pinned_message != previousMessage:
+                self.hasNewArticles = True
 
-        if 'StartPublishingDate' in json.loads(pinnedmessage) and 'EndPublishingDate' in json.loads(pinnedmessage):
-            if self.checkPublishingDate(self.current_pinned_message['StartPublishingDate'],self.current_pinned_message['EndPublishingDate']) == True:
-                self.configure_pinned_message(self.current_pinned_message)
-            else:
-                self.dockwidget.pinned_message.setVisible(False)
-        else:
-            self.configure_pinned_message(self.current_pinned_message)
+            startdate, enddate = self.getStartEndDate(self.current_pinned_message)
+            if self.checkPublishingDate(startdate, enddate) == True:
+                self.dockwidget.pinned_message.mousePressEvent = self.toggle_message_hashfile
+                self.dockwidget.pinned_message.setText(str(self.current_pinned_message["Text"]))
+                if self.check_hashfile(self.createHash(self.current_pinned_message["Text"])) == True :
+                    self.dockwidget.pinned_message.setText(self.dockwidget.pinned_message.text()[:60]+ '...')
+                else:
+                    self.dockwidget.pinned_message.setText(str(self.current_pinned_message["Text"]))
+
+                if self.current_pinned_message["Text"] != "":
+                    self.dockwidget.pinned_message.setVisible(True)
+                if self.current_pinned_message["Importance"]=="low" :
+                    self.dockwidget.pinned_message.setStyleSheet("background:rgb(154, 229, 114);padding:8px;")
+                else:
+                    if self.current_pinned_message["Importance"]=="medium":
+                        self.dockwidget.pinned_message.setStyleSheet("background:rgb(255, 206, 58);padding:8px;")
+                    else:
+                        if self.current_pinned_message["Importance"]=="high":
+                            self.dockwidget.pinned_message.setStyleSheet("background:rgb(255, 85, 0);padding:8px;")
+                        else:
+                            self.dockwidget.pinned_message.setStyleSheet("background:rgb(173,216,230);padding:8px;")
 
     def addLinks(self):
         """ Add links to the link section of the plugin."""
