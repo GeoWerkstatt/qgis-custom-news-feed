@@ -283,9 +283,7 @@ class CustomNewsFeed:
             self.show_panel()
 
         except Exception as e:
-            self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
-                    self.tr(u'Das Feld ' + str(e) + ' ist im angegebenen JSON-file nicht vorhanden.'),
-                    level = Qgis.Critical)
+            self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin", str(e), level = Qgis.Critical)
             QgsMessageLog.logMessage(u'Error Reading Config file, missing field ' + str(e),'Custom News Feed')
 
     def toggle_message_hashfile(self, event):
