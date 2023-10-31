@@ -306,7 +306,7 @@ class CustomNewsFeed:
                 self.hasNewArticles = True
 
             startdate, enddate = self.getStartEndDate(self.current_pinned_message)
-            if self.checkPublishingDate(startdate, enddate) == True:
+            if self.checkPublishingDate(startdate, enddate):
                 self.dockwidget.pinned_message.mousePressEvent = self.toggle_message_hashfile
                 self.dockwidget.pinned_message.setText(str(self.current_pinned_message["Text"]))
                 if self.check_hashfile(self.createHash(self.current_pinned_message["Text"])) == True :
@@ -316,16 +316,15 @@ class CustomNewsFeed:
 
                 if self.current_pinned_message["Text"] != "":
                     self.dockwidget.pinned_message.setVisible(True)
+
                 if self.current_pinned_message["Importance"]=="low" :
                     self.dockwidget.pinned_message.setStyleSheet("background:rgb(154, 229, 114);padding:8px;")
+                elif self.current_pinned_message["Importance"]=="medium":
+                    self.dockwidget.pinned_message.setStyleSheet("background:rgb(255, 206, 58);padding:8px;")
+                elif self.current_pinned_message["Importance"]=="high":
+                    self.dockwidget.pinned_message.setStyleSheet("background:rgb(255, 85, 0);padding:8px;")
                 else:
-                    if self.current_pinned_message["Importance"]=="medium":
-                        self.dockwidget.pinned_message.setStyleSheet("background:rgb(255, 206, 58);padding:8px;")
-                    else:
-                        if self.current_pinned_message["Importance"]=="high":
-                            self.dockwidget.pinned_message.setStyleSheet("background:rgb(255, 85, 0);padding:8px;")
-                        else:
-                            self.dockwidget.pinned_message.setStyleSheet("background:rgb(173,216,230);padding:8px;")
+                    self.dockwidget.pinned_message.setStyleSheet("background:rgb(173,216,230);padding:8px;")
 
     def addLinks(self):
         """ Add links to the link section of the plugin."""
