@@ -335,18 +335,23 @@ class CustomNewsFeed:
         self.dockwidget.linkSectionLabel.setVisible(hasLinks)
 
         if hasLinks:
-            widget = QWidget()
-            vbox = QVBoxLayout()
-            widget.setLayout(vbox)
-            self.dockwidget.linksScrollArea.setWidget(widget)
+            linksWidget = QWidget()
+            linksbox = QVBoxLayout()
+            linksWidget.setLayout(linksbox)
+            self.dockwidget.linksScrollArea.setWidget(linksWidget)
 
             for link in links:
+                linkWidget = QWidget()
+                linkBox = QVBoxLayout()
+                linkBox.setContentsMargins(0,0,0,0)
                 label= QLabel("<a href=% s>% s</a>" % (link['Url'], link['LinkTitle']))
                 label.setTextFormat(Qt.RichText)
                 label.setOpenExternalLinks(True)
-                vbox.addWidget(label)
+                linkBox.addWidget(label)
+                linkWidget.setLayout(linkBox)
+                linksbox.addWidget(linkWidget)
                 
-            vbox.addStretch(1)
+            linksbox.addStretch(1)
 
     def checkPublishingDate(self, startdate, enddate):
         """ Checks the date relevance of a news entry by its date range """
