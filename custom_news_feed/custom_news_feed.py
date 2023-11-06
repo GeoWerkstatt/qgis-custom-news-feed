@@ -94,7 +94,8 @@ class CustomNewsFeed:
         self.toolbar = self.iface.addToolBar(u'CustomNewsFeed')
         self.toolbar.setObjectName(u'CustomNewsFeed')
         self.settingspath = abspath(join(QgsApplication.qgisSettingsDirPath(), 'customnewsfeed'))
-        self.previous_news_path = os.path.join(self.settingspath,'previous_news.json')
+        self.previous_news_name = 'previous_news.json'
+        self.previous_news_path = os.path.join(self.settingspath, self.previous_news_name)
         self.news = None
         self.previousNews = None
         self.hasNewArticles = False
@@ -277,9 +278,9 @@ class CustomNewsFeed:
                 self.hasNewArticles = True
             
             self.add_pinned_message()
-            self.remove_deprecated_hashfiles()
             self.addNews()
             self.addLinks()
+            self.remove_deprecated_hashfiles()
             self.store_current_news()
             self.show_panel()
 
@@ -549,12 +550,16 @@ class CustomNewsFeed:
 
     def remove_deprecated_hashfiles(self):
         """Removes hash files that are not in the current news anymore"""
-        previousNewsArticles = self.get_json_field("NewsArticles",self.previousNews)
-        if previousNewsArticles is not None:
-            newsArticles = self.get_json_field("NewsArticles",self.news)
-            for previousNewsArticle in previousNewsArticles:
-                if previousNewsArticle not in newsArticles:
-                    self.delete_hashfile(self.createHash(previousNewsArticle["Title"]+previousNewsArticle["Date"]))
+        for file_path in os.listdir(self.settingspath):
+            if os.path.isfile(os.path.join(self.settingspath, file_path)):
+                if file_path != self.previous_news_name:
+                    stillExists = False
+                    for article in self.news["NewsArticles"]:
+                        if article["Hash"] == file_path:
+                            stillExists = True
+                            break
+                    if stillExists == False:
+                        self.delete_hashfile(file_path)
 
     def create_tab_widget(self, tab):
         """ Creates a layout for the news articles and adds it to the tab """
