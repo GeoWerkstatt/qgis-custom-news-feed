@@ -552,12 +552,7 @@ class CustomNewsFeed:
         """Removes hash files that are not in the current news anymore"""
         for file_path in os.listdir(self.settingspath):
             if file_path != self.previous_news_name and os.path.isfile(os.path.join(self.settingspath, file_path)):
-                stillExists = False
-                for article in self.news["NewsArticles"]:
-                    if article["Hash"] == file_path:
-                        stillExists = True
-                        break
-                if stillExists == False:
+                if all([article["Hash"] != file_path for article in self.news["NewsArticles"]]):
                     self.delete_hashfile(file_path)
 
     def create_tab_widget(self, tab):
