@@ -449,7 +449,6 @@ class CustomNewsFeed:
         self.dockwidget.readAllButton.setDisabled(hasUnreadNews == False)
 
         self.dockwidget.tabWidget.setCurrentIndex(0)
-        self.dockwidget.setFocus()
 
         if hasUnreadNews == False:
             self.dockwidget.close()
@@ -464,6 +463,7 @@ class CustomNewsFeed:
 
         if self.forceShowGui and not self.dockwidget.isUserVisible():
             self.dockwidget.show()
+            self.dockwidget.raise_()
 
         self.forceShowGui = False
 
