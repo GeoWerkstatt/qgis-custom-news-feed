@@ -574,6 +574,8 @@ class CustomNewsFeed:
 
     def create_article_widget(self, newsArticle):
         """ Creates a widget for a news article """
+        newsArticle['Hash'] = self.createHash(str(newsArticle['Title']+newsArticle['Date']))
+        
         startdate, enddate = self.getStartEndDate(newsArticle)
         if self.checkPublishingDate(startdate, enddate) == True:
             articleWidget = QWidget()
@@ -602,8 +604,6 @@ class CustomNewsFeed:
                 link.setTextFormat(Qt.RichText)
                 link.setOpenExternalLinks(True)
                 textBox.addWidget(link)
-
-            newsArticle['Hash'] = self.createHash(str(newsArticle['Title']+newsArticle['Date']))
         
             isUnread = self.check_hashfile(newsArticle['Hash']) == False
             if isUnread:
