@@ -429,11 +429,14 @@ class CustomNewsFeed:
         hasUnreadNews = False
 
         for newsArticle in newsArticles:
-            if self.hasNewArticles is False and previousNewsArcticles is not None and newsArticle not in previousNewsArcticles:
-                self.hasNewArticles = True
+            newsArticle['Hash'] = self.createHash(str(newsArticle['Title']+newsArticle['Date']))
+        
+            startdate, enddate = self.getStartEndDate(newsArticle)
+            if self.checkPublishingDate(startdate, enddate) == True:
+                if self.hasNewArticles is False and previousNewsArcticles is not None and newsArticle not in previousNewsArcticles:
+                    self.hasNewArticles = True
 
-            articleBox, isUnread = self.create_article_widget(newsArticle)
-            if articleBox is not None:
+                articleBox, isUnread = self.create_article_widget(newsArticle)
                 if isUnread:
                     hasUnreadNews = True
                     unreadNewsBox.addWidget(articleBox)
@@ -574,83 +577,77 @@ class CustomNewsFeed:
 
     def create_article_widget(self, newsArticle):
         """ Creates a widget for a news article """
-        newsArticle['Hash'] = self.createHash(str(newsArticle['Title']+newsArticle['Date']))
+        articleWidget = QWidget()
+        articleBox = QHBoxLayout()
+        articleBox.setContentsMargins(0,0,0,0)
+        articleBox.setSpacing(0)
+        articleWidget.setLayout(articleBox)
+
+        textBox = QVBoxLayout()
+        articleBox.addLayout(textBox)
         
-        startdate, enddate = self.getStartEndDate(newsArticle)
-        if self.checkPublishingDate(startdate, enddate) == True:
-            articleWidget = QWidget()
-            articleBox = QHBoxLayout()
-            articleBox.setContentsMargins(0,0,0,0)
-            articleBox.setSpacing(0)
-            articleWidget.setLayout(articleBox)
+        title = QLabel(newsArticle['Title'])
+        title.setStyleSheet("font-weight: bold")
+        textBox.addWidget(title)
 
-            textBox = QVBoxLayout()
-            articleBox.addLayout(textBox)
-            
-            title = QLabel(newsArticle['Title'])
-            title.setStyleSheet("font-weight: bold")
-            textBox.addWidget(title)
+        date = QLabel(newsArticle['Date'])
+        date.setStyleSheet("color: grey")
+        textBox.addWidget(date)
 
-            date = QLabel(newsArticle['Date'])
-            date.setStyleSheet("color: grey")
-            textBox.addWidget(date)
-
-            text= QLabel(newsArticle['Text'])
-            text.setWordWrap(True)
-            textBox.addWidget(text)
-            
-            if not newsArticle['LinkTitle'] == "":
-                link = QLabel("<a href=% s>% s</a>" % (newsArticle['LinkUrl'], newsArticle['LinkTitle']))
-                link.setTextFormat(Qt.RichText)
-                link.setOpenExternalLinks(True)
-                textBox.addWidget(link)
+        text= QLabel(newsArticle['Text'])
+        text.setWordWrap(True)
+        textBox.addWidget(text)
         
-            isUnread = self.check_hashfile(newsArticle['Hash']) == False
-            if isUnread:
-                spacer = QSpacerItem(0, 5)
-                textBox.addItem(spacer)
-                readbutton = QPushButton(self.news['ReadButtonLabel'])
-                readbutton.clicked.connect(partial(self.create_hashfile, newsArticle['Hash']))
-                readbutton.adjustSize()
-                textBox.addWidget(readbutton)
+        if not newsArticle['LinkTitle'] == "":
+            link = QLabel("<a href=% s>% s</a>" % (newsArticle['LinkUrl'], newsArticle['LinkTitle']))
+            link.setTextFormat(Qt.RichText)
+            link.setOpenExternalLinks(True)
+            textBox.addWidget(link)
+    
+        isUnread = self.check_hashfile(newsArticle['Hash']) == False
+        if isUnread:
+            spacer = QSpacerItem(0, 5)
+            textBox.addItem(spacer)
+            readbutton = QPushButton(self.news['ReadButtonLabel'])
+            readbutton.clicked.connect(partial(self.create_hashfile, newsArticle['Hash']))
+            readbutton.adjustSize()
+            textBox.addWidget(readbutton)
 
-            if not newsArticle["ImageUrl"] == "":
-                imageBox = QVBoxLayout()
-                image = QImage()
-                imageUrl = newsArticle["ImageUrl"]
-                try:
-                    if imageUrl[0:4].lower() == 'http':
-                        request = QNetworkRequest(QUrl(imageUrl))
-                        blockingRequest = QgsBlockingNetworkRequest()
-                        result = blockingRequest.get(request)
-                        if result == QgsBlockingNetworkRequest.NoError:
-                            reply = blockingRequest.reply()
-                            if reply.error() == QNetworkReply.NoError:
-                                image.loadFromData(reply.content())
-                            else:
-                                image = None
-                                QgsMessageLog.logMessage(u'Error reading image ' + reply.errorString(),'Custom News Feed')
+        if not newsArticle["ImageUrl"] == "":
+            imageBox = QVBoxLayout()
+            image = QImage()
+            imageUrl = newsArticle["ImageUrl"]
+            try:
+                if imageUrl[0:4].lower() == 'http':
+                    request = QNetworkRequest(QUrl(imageUrl))
+                    blockingRequest = QgsBlockingNetworkRequest()
+                    result = blockingRequest.get(request)
+                    if result == QgsBlockingNetworkRequest.NoError:
+                        reply = blockingRequest.reply()
+                        if reply.error() == QNetworkReply.NoError:
+                            image.loadFromData(reply.content())
                         else:
                             image = None
-                            QgsMessageLog.logMessage(u'Error reading image ' + blockingRequest.errorMessage(),'Custom News Feed')
-                    else :
-                        with open(imageUrl, 'rb') as file:
-                            image.loadFromData(file.read())
-                except Exception as e:                                    
-                    self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
-                        self.tr(u'Das Bild mit der Url ') + imageUrl +
-                        self.tr(u' konnte nicht geladen werden. '),
-                        level = Qgis.Critical)
-                    QgsMessageLog.logMessage(u'Error reading image ' + str(e),'Custom News Feed')
-                if image is not None:
-                    image_label = QLabel()
-                    image_label.setFixedWidth(150)
-                    image_label.setPixmap(QPixmap(image).scaledToWidth(150, Qt.SmoothTransformation))
-                    imageBox.setContentsMargins(10,15,0,0)
-                    imageBox.addWidget(image_label)
-                    articleBox.addLayout(imageBox)
-            
-            articleBox.setContentsMargins(0,0,0,10)
-            return articleWidget, isUnread
-        else:
-            return None, False
+                            QgsMessageLog.logMessage(u'Error reading image ' + reply.errorString(),'Custom News Feed')
+                    else:
+                        image = None
+                        QgsMessageLog.logMessage(u'Error reading image ' + blockingRequest.errorMessage(),'Custom News Feed')
+                else :
+                    with open(imageUrl, 'rb') as file:
+                        image.loadFromData(file.read())
+            except Exception as e:                                    
+                self.iface.messageBar().pushMessage("Fehler im Custom News Feed Plugin",
+                    self.tr(u'Das Bild mit der Url ') + imageUrl +
+                    self.tr(u' konnte nicht geladen werden. '),
+                    level = Qgis.Critical)
+                QgsMessageLog.logMessage(u'Error reading image ' + str(e),'Custom News Feed')
+            if image is not None:
+                image_label = QLabel()
+                image_label.setFixedWidth(150)
+                image_label.setPixmap(QPixmap(image).scaledToWidth(150, Qt.SmoothTransformation))
+                imageBox.setContentsMargins(10,15,0,0)
+                imageBox.addWidget(image_label)
+                articleBox.addLayout(imageBox)
+        
+        articleBox.setContentsMargins(0,0,0,10)
+        return articleWidget, isUnread
