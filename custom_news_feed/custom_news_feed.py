@@ -459,14 +459,15 @@ class CustomNewsFeed:
                 self.iface.messageBar().pushMessage("Warning", "Aktuell existieren keine ungelesenen Nachrichten", level=Qgis.Info)
 
     def show_panel(self):
-        if self.hasNewArticles:
-            self.iface.messageBar().pushMessage("Info", "Es liegen neue Nachrichten vor!", level=Qgis.Info)
-            if self.forceShowGui is False:
+        if not self.dockwidget.isUserVisible():
+            if self.forceShowGui is False and self.hasNewArticles:
                 self.forceShowGui = self.settings_dlg.openPanelOnNewsCheckBox.checkState() == Qt.Checked
 
-        if self.forceShowGui and not self.dockwidget.isUserVisible():
-            self.dockwidget.show()
-            self.dockwidget.raise_()
+            if self.forceShowGui:
+                self.dockwidget.show()
+                self.dockwidget.raise_()
+            elif self.hasNewArticles:
+                self.iface.messageBar().pushMessage("Info", "Es liegen neue Nachrichten vor!", level=Qgis.Info)
 
         self.forceShowGui = False
 
