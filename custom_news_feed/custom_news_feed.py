@@ -302,12 +302,12 @@ class CustomNewsFeed:
         self.dockwidget.pinned_message.setVisible(False)
         self.current_pinned_message = self.get_json_field("PinnedMessage",self.news)
         if self.current_pinned_message is not None:
-            previousMessage = self.get_json_field("PinnedMessage",self.previousNews)
-            if previousMessage is None or self.current_pinned_message != previousMessage:
-                self.hasNewArticles = True
-
             startdate, enddate = self.getStartEndDate(self.current_pinned_message)
             if self.checkPublishingDate(startdate, enddate):
+                previousMessage = self.get_json_field("PinnedMessage",self.previousNews)
+                if previousMessage is None or self.current_pinned_message != previousMessage:
+                    self.hasNewArticles = True
+
                 self.dockwidget.pinned_message.mousePressEvent = self.toggle_message_hashfile
                 self.dockwidget.pinned_message.setText(str(self.current_pinned_message["Text"]))
                 if self.check_hashfile(self.createHash(self.current_pinned_message["Text"])) == True :
