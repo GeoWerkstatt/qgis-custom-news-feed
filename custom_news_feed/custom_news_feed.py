@@ -262,6 +262,7 @@ class CustomNewsFeed:
     def display_news_content(self, news_json_file_path):
         """Display content of JSON-file in plugin."""
         try:
+            if not QDir(self.settingspath).exists(): QDir().mkdir(self.settingspath)
             self.news = self.load_json_from_file(news_json_file_path)
             self.timer.start(self.news['NewsRefreshInterval'] * 60000 ) # convert minutes in miliseconds
             self.dockwidget.setWindowTitle(self.news['PanelTitle'])
