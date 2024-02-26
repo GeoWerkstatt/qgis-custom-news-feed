@@ -345,7 +345,7 @@ class CustomNewsFeed:
                 linkWidget = QWidget()
                 linkBox = QVBoxLayout()
                 linkBox.setContentsMargins(0,0,0,0)
-                label= QLabel("<a href=% s>% s</a>" % (link['Url'], link['LinkTitle']))
+                label= QLabel("<a href='% s'>% s</a>" % (link['Url'], link['LinkTitle']))
                 label.setTextFormat(Qt.RichText)
                 label.setOpenExternalLinks(True)
                 linkBox.addWidget(label)
@@ -601,7 +601,7 @@ class CustomNewsFeed:
         textBox.addWidget(text)
         
         if not newsArticle['LinkTitle'] == "":
-            link = QLabel("<a href=% s>% s</a>" % (newsArticle['LinkUrl'], newsArticle['LinkTitle']))
+            link = QLabel("<a href='% s'>% s</a>" % (newsArticle['LinkUrl'], newsArticle['LinkTitle']))
             link.setTextFormat(Qt.RichText)
             link.setOpenExternalLinks(True)
             textBox.addWidget(link)
